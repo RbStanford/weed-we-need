@@ -371,6 +371,174 @@
             color: var(--text);
         }
 
+        .cart-btn {
+            margin-left: auto;
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: all 0.15s;
+        }
+
+        .cart-btn.selected {
+            opacity: 1;
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .deal-card.in-cart {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(34,197,94,0.3);
+        }
+
+        .floating-cart {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent);
+            color: #fff;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 200;
+            border: none;
+        }
+
+        .floating-cart.visible {
+            display: flex;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .route-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 2px solid var(--accent);
+            border-radius: 16px 16px 0 0;
+            padding: 20px;
+            z-index: 300;
+            display: none;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+        }
+
+        .route-panel.open {
+            display: block;
+        }
+
+        .route-panel h3 {
+            font-size: 20px;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+
+        .runner-picker {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .runner-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: var(--surface);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .runner-btn.active {
+            border-color: var(--accent);
+            background: rgba(34,197,94,0.1);
+        }
+
+        .route-stop {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .route-stop .stop-num {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        .route-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            margin-top: 16px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .route-close {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .route-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 250;
+            display: none;
+        }
+
+        .route-overlay.open {
+            display: block;
+        }
+
         /* Light mode only */
     </style>
 </head>
@@ -379,13 +547,13 @@
         <div class="header-top">
             <div>
                 <h1>&#127807; The Weed We Need</h1>
-                <p class="stats">Jared &amp; Nicole's Daily Deal Report &middot; 14 deals &middot; 10 dispensaries</p>
-                <p class="stats">Updated April 11, 2026 at 03:04 AM</p>
+                <p class="stats">Jared &amp; Nicole's Daily Deal Report &middot; 17 deals &middot; 10 dispensaries</p>
+                <p class="stats">Updated April 11, 2026 at 12:45 PM</p>
             </div>
             <button class="refresh-btn" onclick="location.reload()">&#8635; Refresh</button>
         </div>
         <div class="filters">
-            <button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="concentrates">Concentrates</button><button class="filter-btn" data-filter="flower">Flower</button><button class="filter-btn" data-filter="pre-rolls">Pre-rolls</button><button class="filter-btn" data-filter="tinctures">Tinctures</button><button class="filter-btn" data-filter="vapes">Vapes</button>
+            <button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="concentrates">Concentrates</button><button class="filter-btn" data-filter="flower">Flower</button><button class="filter-btn" data-filter="pre-rolls">Pre-rolls</button><button class="filter-btn" data-filter="tinctures">Tinctures</button><button class="filter-btn" data-filter="vape">Vape</button><button class="filter-btn" data-filter="vapes">Vapes</button>
         </div>
     </header>
 
@@ -409,18 +577,19 @@
                         <p class="disp-standing">first purchase: 50% Off • veterans: 25% Off • seniors: 15% Off (55+)</p>
                     </div>
                 </div>
-                <a href="https://ayrdispensaries.com/florida/discount-programs/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower — Click Here To Order Now</a>
+                <a href="https://ayrdispensaries.com/florida/discount-programs/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower &mdash; Click Here To Order Now</a>
             </div>
             
             <div class="deals-grid">
                 
-            <div class="deal-card" data-category="concentrates">
+            <div class="deal-card" data-category="concentrates" data-disp="AYR Wellness" data-lat="27.4175" data-lng="-80.3535">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_6_2056072509.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
                 <div class="deal-content">
                     <div class="deal-header">
                         <span class="category-tag" style="background:#8b5cf620; color:#8b5cf6">Concentrates</span>
                         
                         <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">Big Deals on Flower, Vapes, Concentrates & Pre-Rolls</h3>
                     <p class="deal-desc">• Spend $300 April 1-20 & Earn $25 Off $100<br>• Spend $500 April 1-30 & Earn 30% Stackable Coupon<br>• Buy 4 Units of Concentrates, Receive a Coupon for 1 $15 Concentrate of Your Choice<br>• Redeemable Only April 13-19<br>• 5 for $100 Kynd Flower<br>• 3 for $90 Dompen Vape Cartridges | 1G<br>• Shop Dompen Vapes<br>• Shop 1g Pre-Rolls<br>• 14 for $80 Kynd Pre-Rolls | 1G<br>• 14 for $60 Later Days Pre-Rolls | 1G<br>• 4 for $60 Later Days Flower | 3.5g<br>• 2 for $40 Kynd Truckee Thunder Whole Flower | 3.5g<br>• Shop Truckee Thunder<br>• Coupon is a one-time use per person<br>• Discounts are valid for qualifying rewards members only<br>• Must be redeemed between 4/1-4/19<br>• Ask your budtender for details</p>
@@ -437,21 +606,35 @@
                         <p class="disp-standing">first purchase: 40% Off • veterans: 20% Off • seniors: 10% Off (55+) • birthday: 25% Off • delivery: Available statewide</p>
                     </div>
                 </div>
-                <a href="https://curaleaf.com" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower — Click Here To Order Now</a>
+                <a href="https://curaleaf.com" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower &mdash; Click Here To Order Now</a>
             </div>
             <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.432,-80.395" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">2.7 mi</span> <span class="loc-addr">5192 Okeechobee Rd, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.283,-80.389" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">9.5 mi</span> <span class="loc-addr">1703 NW St Lucie West Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.262,-80.237" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">12.9 mi</span> <span class="loc-addr">3458 NW Federal Hwy, Jensen Beach</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.154,-80.2183" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">20.0 mi</span> <span class="loc-addr">4203 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
             <div class="deals-grid">
                 
-            <div class="deal-card" data-category="flower">
+            <div class="deal-card" data-category="flower" data-disp="Curaleaf" data-lat="27.432" data-lng="-80.395">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_36_1369919445.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
                 <div class="deal-content">
                     <div class="deal-header">
                         <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
                         
                         <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">Mix & Match, BOGO, and Storewide Savings</h3>
                     <p class="deal-desc">• Mention FL CANNABIS DEALS to your budtender & receive an extra 10% OFF<br>• Maximum discount not to exceed 60%<br>• Mix & Match 1/2 Oz $55<br>• Buy a Pineapple Express Briq 2 get a 0.5g Curaleaf cart for $10 PEN-APPLE EXPRESS BUNDLE<br>• 1g Pre-Rolls 6 for $31<br>• Edibles 60% OFF<br>• 40% OFF STOREWIDE!<br>• Vapes Starting at 35% OFF<br>• TRY OUR $15+ MENU<br>• Multiple Products. All Categories. Starting at $15+</p>
+                </div>
+            </div>
+            <div class="deal-card" data-category="vape" data-disp="Curaleaf" data-lat="27.432" data-lng="-80.395">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_34_1429366653.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#3b82f620; color:#3b82f6">Vape</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
+                    </div>
+                    <h3 class="deal-title">Storewide & Category Deals This Weekend!</h3>
+                    <p class="deal-desc">• Mention FL CANNABIS DEALS to your budtender & receive an extra 10% OFF<br>• Maximum discount not to exceed 60%<br>• 50% OFF STOREWIDE!<br>• Buy a Pineapple Express Briq 2 get a 0.5g Curaleaf cart for $10<br>• 1g Select Cliqs 2 for $50<br>• Buy 4 (1g Select Cliqs), get a free battery!<br>• 1g Pre-Rolls 6 for $31<br>• Edibles 60% OFF<br>• Live Rosin 40% OFF<br>• Vapes Starting at 35% OFF<br>• STOP & SMELL THE FLOWER TRY OUR $15+ MENU<br>• Multiple Products. All Categories. Starting at $15+<br>• 420 GREEN CARPET WEEKEND</p>
                 </div>
             </div>
             </div>
@@ -465,42 +648,32 @@
                         <p class="disp-standing">first purchase: 50% Off • veterans: 20% Off • seniors: 20% Off (55+) • birthday: $25 Off $50 • delivery: Free over $200</p>
                     </div>
                 </div>
-                <a href="https://getfluent.com/promotions/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower — Click Here To Order Now</a>
+                <a href="https://getfluent.com/promotions/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower &mdash; Click Here To Order Now</a>
             </div>
             <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.422,-80.331" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">1.4 mi</span> <span class="loc-addr">2509 S US Hwy 1, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a></div>
             <div class="deals-grid">
                 
-            <div class="deal-card" data-category="flower">
+            <div class="deal-card" data-category="flower" data-disp="Fluent" data-lat="27.422" data-lng="-80.331">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_8_1454301720.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
                 <div class="deal-content">
                     <div class="deal-header">
                         <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
                         
                         <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">Weekly Deals & Higher Hour Specials</h3>
                     <p class="deal-desc">• 4/10 - 4/16: Everyday is FOUR TWENTY<br>• Higher Hour Special: Friday 4/10 4:20pm-Close<br>• Higher Hour Special: ALL EIGHTHS: $14<br>• Knack: Choose any Eighth $18 (Reg $35)<br>• Bag-O: Choose any Half Oz. $55 (Reg $90)<br>• Freedom Town: Choose any Eighth $20 (Reg $40)<br>• ALL 0.5G CARTRIDGES: $20</p>
                 </div>
             </div>
-            <div class="deal-card" data-category="flower">
-                <img src="https://cannadealsfl.com/api/images/deal-images/image_15_527282514.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
-                <div class="deal-content">
-                    <div class="deal-header">
-                        <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
-                        
-                        <span class="verified" title="Verified">&#10003;</span>
-                    </div>
-                    <h3 class="deal-title">Eighths for $18 & $22, Vapes for $25</h3>
-                    <p class="deal-desc">• Knack: Choose any Eighth for $18 (Reg $35)<br>• Moods Black: Mini 1g AIO for $35 (Reg $65)<br>• Freedom Town: Choose any Eighth for $22 (Reg $40)<br>• Moods: Mini 1g AIO for $30 (Reg $60)<br>• Vape Carts: All 1g Carts for $25</p>
-                </div>
-            </div>
-            <div class="deal-card" data-category="pre-rolls">
+            <div class="deal-card" data-category="pre-rolls" data-disp="Fluent" data-lat="27.422" data-lng="-80.331">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_6_1267086510.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
                 <div class="deal-content">
                     <div class="deal-header">
                         <span class="category-tag" style="background:#ef444420; color:#ef4444">Pre-rolls</span>
                         
                         <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">Higher Hour Deals: Pre-Rolls, Eighths, Edibles & More!</h3>
                     <p class="deal-desc">• 4X Rewards Points on all orders during Higher Hour (4:20 PM - Close)<br>• ALL 1G PRE-ROLLS: $4.20 (4/11)<br>• ALL EIGHTHS: $14 (4/10)<br>• CHOCOLATES & GELS: $4.20 (4/12)<br>• GET 2 BAG-O 7G GROUND FLOWER: $50 (4/13)<br>• GET 2 BAG-O 14G WHOLE FLOWER: $90 (4/13)<br>• ALL 1G PRE-ROLLS: $4.20 (4/11)<br>• 4X REWARDS POINTS ON ALL ORDERS DURING HIGHER HOUR (4:20PM - CLOSE)</p>
@@ -517,18 +690,19 @@
                         <p class="disp-standing">first purchase: 50% Off • veterans: 22% Off • seniors: 20% Off (55+) • birthday: Free Joint • referral: $20 Credit</p>
                     </div>
                 </div>
-                <a href="https://www.greendragonfl.com/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower — Click Here To Order Now</a>
+                <a href="https://www.greendragonfl.com/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower &mdash; Click Here To Order Now</a>
             </div>
             <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.425,-80.33" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">1.5 mi</span> <span class="loc-addr">2217 S US Hwy 1, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.175,-80.227" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">18.5 mi</span> <span class="loc-addr">2285 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
             <div class="deals-grid">
                 
-            <div class="deal-card" data-category="concentrates">
+            <div class="deal-card" data-category="concentrates" data-disp="Green Dragon" data-lat="27.425" data-lng="-80.33">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_7_1025661717.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
                 <div class="deal-content">
                     <div class="deal-header">
                         <span class="category-tag" style="background:#8b5cf620; color:#8b5cf6">Concentrates</span>
                         
                         <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">Double Points & $20 Cloud Sugar</h3>
                     <p class="deal-desc">• TODAY ONLY DOUBLE POINTS WITH PURCHASE OF EVERYDAY WAX<br>• APRIL 6 - 12<br>• $20 CLOUD SUGAR<br>• SELECT STRAINS</p>
@@ -545,18 +719,32 @@
                         <p class="disp-standing">first purchase: 50% Off + Free Pre-roll • veterans: 30% Off • hardship: 20% Off • birthday: $10 Off $50 • delivery: Free over $75</p>
                     </div>
                 </div>
-                <a href="https://growhealthy.com/discounts/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower — Click Here To Order Now</a>
+                <a href="https://growhealthy.com/discounts/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower &mdash; Click Here To Order Now</a>
             </div>
             <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.154,-80.214" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">20.1 mi</span> <span class="loc-addr">3462 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
             <div class="deals-grid">
                 
-            <div class="deal-card" data-category="flower">
+            <div class="deal-card" data-category="flower" data-disp="Grow Healthy" data-lat="27.154" data-lng="-80.214">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_31_1430290174.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
+                    </div>
+                    <h3 class="deal-title">Flower Deals, Vape Savings & 55% Off Storewide</h3>
+                    <p class="deal-desc">• MPX Select Kashmir 3.5G Flower $35<br>• GrowHealthy AIO Saturdays 50% Off Live Resin + Rosin<br>• 1G Live Rosin $37.50 (was $75)<br>• 1G Live Resin $32.50 (was $65)<br>• 2G Live Resin $50 (was $100)<br>• All In One Vapes!<br>• GrowHealthy 2 for $35 (Flower 1/8ths)<br>• MPX Select 2 for $45 (Flower 1/8ths)<br>• The Vault Sunshine State 2 for $55 (Flower 1/8ths)<br>• $10 - 0.5G Black Label Distillate Carts<br>• $9 - 1G Premium Brand Pre-Rolls<br>• $7 - 1G MPX Pre-Rolls<br>• $6 - 0.7G GH Pre-Rolls<br>• Up To 55% Off Storewide</p>
+                </div>
+            </div>
+            <div class="deal-card" data-category="flower" data-disp="Grow Healthy" data-lat="27.154" data-lng="-80.214">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_37_1265239468.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
                 <div class="deal-content">
                     <div class="deal-header">
                         <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
                         
                         <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">Flower Deals, Carts, Pre-Rolls & Storewide Savings!</h3>
                     <p class="deal-desc">• MPX SKUNK SELECT 3.5g Flower 35% THC $35<br>• GrowHealthy 2 for $35<br>• MPX SELECT 2 for $45<br>• THE VAULT SUNSHINE STATE 2 for $55<br>• $10 - 0.5G BLACK LABEL DISTILLATE CARTS<br>• $9 - 1G PREMIUM BRAND PRE-ROLLS<br>• $7 - 1G MPX PRE-ROLLS<br>• $6 - 0.7G GH PRE-ROLLS<br>• UP TO 55% OFF STOREWIDE</p>
@@ -573,18 +761,19 @@
                         <p class="disp-standing">first purchase: 50% Off • veterans: 20% Off • seniors: 15% Off (55+) • birthday: Free Pre-roll or Edible • delivery: Available select locations</p>
                     </div>
                 </div>
-                <a href="https://www.muvfl.com" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower — Click Here To Order Now</a>
+                <a href="https://www.muvfl.com" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower &mdash; Click Here To Order Now</a>
             </div>
             <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.436,-80.3255" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">2.1 mi</span> <span class="loc-addr">1006 S US Hwy 1, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.2633,-80.3944" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">10.9 mi</span> <span class="loc-addr">1564 NW Gatlin Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.213,-80.277" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">14.9 mi</span> <span class="loc-addr">3550 NW Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
             <div class="deals-grid">
                 
-            <div class="deal-card" data-category="flower">
+            <div class="deal-card" data-category="flower" data-disp="Müv" data-lat="27.436" data-lng="-80.3255">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_6_1453378199.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
                 <div class="deal-content">
                     <div class="deal-header">
                         <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
                         
                         <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">Buy 1 Get 1 Flower & Edibles, 50% Off Extracts</h3>
                     <p class="deal-desc">• BUY 1, GET 1 Flower<br>• BUY 1, GET 1 Edibles<br>• 50% OFF Extracts<br>• 50% OFF 2 or More 1g & 2g Vapes<br>• 40% OFF STOREWIDE<br>• *Excludes Savvy flower and flower over 28% THC.<br>• *Exclusions may apply.<br>• April 10-12</p>
@@ -601,30 +790,45 @@
                         <p class="disp-standing">first purchase: 50% Off + Future $0.01 Products • veterans: 40% Off • seniors: 25% Off (55+) • industry: 25% Off (Mon-Wed) • compassionate: 20% Off • delivery: $50 Minimum</p>
                     </div>
                 </div>
-                <a href="https://planet13.com/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower — Click Here To Order Now</a>
+                <a href="https://planet13.com/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower &mdash; Click Here To Order Now</a>
             </div>
             <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.215,-80.274" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">14.8 mi</span> <span class="loc-addr">3501 NW Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
             <div class="deals-grid">
                 
-            <div class="deal-card" data-category="tinctures">
+            <div class="deal-card" data-category="flower" data-disp="Planet 13" data-lat="27.215" data-lng="-80.274">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_32_1431213695.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
+                    </div>
+                    <h3 class="deal-title">Bundle Deals & Percentage Off Select Products</h3>
+                    <p class="deal-desc">• $65 Bundle: Medizin 3.5g Flower & Cold Cure Rosin<br>• 50% Off planet 13 Pre-Roll Singles<br>• 50% Off Nano Singles<br>• 50% Off 0.5g Vapes<br>• 40% Off planet 13 Tier 2 & 3 3.5g Flower<br>• 40% Off 1g Vapes (Tier 2 & 3)<br>• 30% Off Edibles<br>• 30% Off Tinctures<br>• 30% Off Topicals<br>• 20% Off planet 13 Tier 1 Medizin Flower<br>• Distillate only (for 50% Off Pre-Roll Singles, Nano Singles & 0.5g Vapes)<br>• Distillate only (for 40% Off 3.5g Flower & 1g Vapes)<br>• Foam strain only for the $65 Bundle<br>• Excludes products powered by ONI for the $65 Bundle</p>
+                </div>
+            </div>
+            <div class="deal-card" data-category="tinctures" data-disp="Planet 13" data-lat="27.215" data-lng="-80.274">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_6_1480160308.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
                 <div class="deal-content">
                     <div class="deal-header">
                         <span class="category-tag" style="background:#10b98120; color:#10b981">Tinctures</span>
                         
                         <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">Power Hour Deals: 50% Off & Special Prices</h3>
                     <p class="deal-desc">• Power Hour: 4:20PM - Close (7PM)<br>• 50% OFF MEDIZIN TINCTURES<br>• $29 PLANET 13 1G COLD CURE LIVE ROSIN & JAM<br>• $9 PLANET 13 RSO EDIBLES</p>
                 </div>
             </div>
-            <div class="deal-card" data-category="vapes">
+            <div class="deal-card" data-category="vapes" data-disp="Planet 13" data-lat="27.215" data-lng="-80.274">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_35_1264315947.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
                 <div class="deal-content">
                     <div class="deal-header">
                         <span class="category-tag" style="background:#0ea5e920; color:#0ea5e9">Vapes</span>
                         
                         <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">BOGO FREE Vapes, Flower, Edibles & More</h3>
                     <p class="deal-desc">• B1G1 FREE 0.5G VAPES (Distillate only. Excludes Products Powered by Oni.)<br>• B1G1 FREE DREAMLAND CHOCOLATES<br>• B2G1 FREE 0.5G & 1G PRE-ROLLS (Excludes packs and Leaf & Vine)<br>• $23 for 1G DISTILLATE VAPES<br>• planet 13 3 FOR $55 TIER 2 | 3.5G FLOWER<br>• planet 13 4 FOR $60 TIER 2 | 3.5G FLOWER<br>• 20% OFF planet 13 & MEDIZIN FLOWER (Including 3.5g, 7g, 14g)<br>• 30% OFF planet 13 EDIBLES<br>• 2 FOR $50 TINCTURES & TOPICALS<br>• $65 MEDIZIN BUNDLE (3.5G FLOWER & COLD CURE ROSIN)<br>• *FOAM strain only. Excludes products powered by ONI.</p>
@@ -641,18 +845,19 @@
                         <p class="disp-standing">first purchase: 60% Off Up To $150 • veterans: 10% Off Thursdays • seniors: 5% Off Wednesdays (65+) • birthday: $5 Small Bud or Free 0.5g Vape • industry: 5% Off Tuesdays • milestone: Free Edible at 25 visits</p>
                     </div>
                 </div>
-                <a href="https://www.sanctuarymed.com/#about-us/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower — Click Here To Order Now</a>
+                <a href="https://www.sanctuarymed.com/#about-us/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower &mdash; Click Here To Order Now</a>
             </div>
             <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.433,-80.413" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">3.8 mi</span> <span class="loc-addr">5774 Okeechobee Rd, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a></div>
             <div class="deals-grid">
                 
-            <div class="deal-card" data-category="flower">
+            <div class="deal-card" data-category="flower" data-disp="Sanctuary" data-lat="27.433" data-lng="-80.413">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_8_1482930871.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
                 <div class="deal-content">
                     <div class="deal-header">
                         <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
                         
                         <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">Doorbuster Deals, Flash Sales & Build Your Own Bundle</h3>
                     <p class="deal-desc">• Sanctuary Signature Flower: ANY 2 FOR $50<br>• Sanctuary 7G Mini Buds: ANY 2 FOR $55<br>• Sanctuary Naturals Flower: ANY 3 FOR $55<br>• Sanctuary 3.5G Flower 27% THC or Less: PICK 3 FOR $45<br>• 1G Pre-Rolls: ANY 6 FOR $30<br>• 5PK 1G Pre-Rolls: ANY 2 FOR $36<br>• Ground Flower: 1/2 OZ $32<br>• Ground Flower: 1 OZ $58<br>• 1G Liquid Rosin Live! & 1G Resin All-in-One Vapes: EACH FOR $20<br>• 50% OFF ENTIRE STORE (Excluding Apparel, Accessories & Puffco Items)<br>• 0.5G Vapes: GET ANY 3 FOR $50<br>• Any Edible: CHOOSE 4 FOR $48<br>• Spend $60, Get a Free T-Shirt or Hat!<br>• Build Your Own Bundle: ANY 3 ITEMS FOR $90 (Excluding Accessories, HQ Tinctures, 1g Ryzin & Liquid Rosin Live! 4G Flower, 4G-5G Concentrates)<br>• Spend $60, Get a 1G Live Rosin for Only $35<br>• Flash Sale in Full Bloom From 1PM Until Close<br>• Spend $75, Get (10) 1G Pre-Rolls for Only $10<br>• 1G Crumble: EACH $30<br>• 1G Crumble: 2 FOR $50</p>
@@ -669,30 +874,32 @@
                         <p class="disp-standing">first purchase: 60% Off (Max $250) • second purchase: 60% Off (Max $250) • veterans: 15% Off + Double Points • seniors: 15-30% Off (55+) • birthday: Free Pre-roll or Chews</p>
                     </div>
                 </div>
-                <a href="https://surterra.com" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower — Click Here To Order Now</a>
+                <a href="https://surterra.com" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower &mdash; Click Here To Order Now</a>
             </div>
             <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.264,-80.329" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">10.7 mi</span> <span class="loc-addr">1752 SW Gatlin Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a></div>
             <div class="deals-grid">
                 
-            <div class="deal-card" data-category="flower">
+            <div class="deal-card" data-category="flower" data-disp="Surterra" data-lat="27.264" data-lng="-80.329">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_6_1451531157.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
                 <div class="deal-content">
                     <div class="deal-header">
                         <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
                         
                         <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">Free Eighth With THC Purchase - Limited Time!</h3>
                     <p class="deal-desc">• Shop from 5 - 7pm today and get a FREE Eighth with any THC purchase!</p>
                 </div>
             </div>
-            <div class="deal-card" data-category="flower">
+            <div class="deal-card" data-category="flower" data-disp="Surterra" data-lat="27.264" data-lng="-80.329">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_24_2038125827.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
                 <div class="deal-content">
                     <div class="deal-header">
                         <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
                         
                         <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">Get Two Free Eighths When You Purchase 2 oz</h3>
                     <p class="deal-desc">• Get TWO FREE EIGHTHS When You Purchase 2 oz<br>• This April, buy any 2 oz of whole flower and earn TWO FREE EIGHTHS as a loyalty reward in May.</p>
@@ -709,18 +916,32 @@
                         <p class="disp-standing">first purchase: 50% Off • veterans: 20% Off • seniors: 10% Off (55+) • birthday: Free Pre-roll • loyalty: Points on every purchase</p>
                     </div>
                 </div>
-                <a href="https://www.trulieve.com" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower — Click Here To Order Now</a>
+                <a href="https://www.trulieve.com" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower &mdash; Click Here To Order Now</a>
             </div>
             <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.426,-80.33" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">1.6 mi</span> <span class="loc-addr">2200 S US Hwy 1, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.278,-80.324" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">9.8 mi</span> <span class="loc-addr">1707 SE Port St Lucie Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.2631,-80.3395" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">10.7 mi</span> <span class="loc-addr">1858 SW Gatlin Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.185,-80.24" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">17.5 mi</span> <span class="loc-addr">2100 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.171,-80.227" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">18.7 mi</span> <span class="loc-addr">2443 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
             <div class="deals-grid">
                 
-            <div class="deal-card" data-category="flower">
+            <div class="deal-card" data-category="flower" data-disp="Trulieve" data-lat="27.426" data-lng="-80.33">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_13_1332890518.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
+                    </div>
+                    <h3 class="deal-title">Mix & Match, BOGO & Daily Deals!</h3>
+                    <p class="deal-desc">• Mix & Match 3 for $105.0 (1g Co2lors AIO, 1g Liquid Live Resin Cart, .5g Live Rosin Carts, 300mg Capsules)<br>• 3.5g Flower 2 for $50.0<br>• 3.5g Flower $17.50<br>• SweetTalk Classic Gummies $10.0<br>• SweetTalk Fast Acting, RSO, and Live Resin Gummies $15.0<br>• Gummies, Chocolate, Cookies and Brownies $12.50<br>• Premium 3.5g Flower 2 for $90.0<br>• Premium 3.5g Flower 3 for $120.0<br>• 3.5g Flower $25.0<br>• FREE Sunshine hat with any Sunshine Cannabis purchase (Available 4/11 ONLY)</p>
+                </div>
+            </div>
+            <div class="deal-card" data-category="flower" data-disp="Trulieve" data-lat="27.426" data-lng="-80.33">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_6_1721781972.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
                 <div class="deal-content">
                     <div class="deal-header">
                         <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
                         
                         <span class="verified" title="Verified">&#10003;</span>
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">Mix & Match, 2 for $50 Flower & More</h3>
                     <p class="deal-desc">• Mix & Match: 3 for $105 on 1g Co2lors AIO, 1g Liquid Live Resin Cart, .5g Live Resin Carts, 300mg Capsules<br>• 3.5g Flower: 2 for $50<br>• 3.5g Flower: 2 for $50<br>• 3.5g Flower: $17.50<br>• 1g Co2lors AIO: Included in Mix & Match deal<br>• 1g Liquid Live Resin Cart: Included in Mix & Match deal<br>• 0.5g Live Resin Carts: Included in Mix & Match deal<br>• 300mg Capsules: Included in Mix & Match deal<br>• SweetTalk Classic Gummies: $10<br>• SweetTalk Fast Acting, RSO, and Live Resin Gummies: $15<br>• Gummies, Chocolate, Cookies and Brownies: $12.50<br>• Premium 3.5g Flower: 2 for $90<br>• Premium 3.5g Flower: 3 for $120<br>• 3.5g Flower: $20<br>• Rolling Tray FREE with any '.40 Roll One' purchase<br>• Available 4/10 Only</p>
@@ -735,7 +956,119 @@
         <p>Made with &#10084;&#65039; by Rob</p>
     </footer>
 
+    <button class="floating-cart" id="floatingCart" onclick="openRoutePanel()">
+        &#128663;
+        <span class="cart-count" id="cartCount">0</span>
+    </button>
+
+    <div class="route-overlay" id="routeOverlay" onclick="closeRoutePanel()"></div>
+    <div class="route-panel" id="routePanel">
+        <button class="route-close" onclick="closeRoutePanel()">&times;</button>
+        <h3>&#127807; The Weed Run</h3>
+        <div class="runner-picker">
+            <button class="runner-btn active" id="runnerJared" onclick="pickRunner('Jared')">&#128587;&#8205;&#9794;&#65039; Jared's Run</button>
+            <button class="runner-btn" id="runnerNicole" onclick="pickRunner('Nicole')">&#128587;&#8205;&#9792;&#65039; Nicole's Run</button>
+        </div>
+        <p id="runnerLabel" style="font-size:13px; color:#666; margin-bottom:12px;">Jared is making The Weed Run today</p>
+        <div id="routeStops"></div>
+        <a id="routeLink" class="route-btn" target="_blank" rel="noopener">&#128663; Start The Weed Run in Google Maps</a>
+        <button class="route-btn" style="background:#ef4444; margin-top:8px;" onclick="clearCart()">Clear All</button>
+    </div>
+
     <script>
+        const HQ_LAT = 27.4175;
+        const HQ_LNG = -80.3535;
+        const cart = new Set();
+
+        function toggleCart(btn) {
+            const card = btn.closest('.deal-card');
+            const key = card.dataset.disp + '|' + card.dataset.lat + '|' + card.dataset.lng;
+            const title = card.querySelector('.deal-title').textContent;
+
+            if (cart.has(key + '|' + title)) {
+                cart.delete(key + '|' + title);
+                btn.classList.remove('selected');
+                card.classList.remove('in-cart');
+            } else {
+                cart.add(key + '|' + title);
+                btn.classList.add('selected');
+                card.classList.add('in-cart');
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const count = cart.size;
+            document.getElementById('cartCount').textContent = count;
+            document.getElementById('floatingCart').classList.toggle('visible', count > 0);
+        }
+
+        function openRoutePanel() {
+            // Group by dispensary and get unique stops
+            const stops = {};
+            cart.forEach(item => {
+                const [disp, lat, lng, ...titleParts] = item.split('|');
+                const title = titleParts.join('|');
+                if (!stops[disp]) stops[disp] = { lat: parseFloat(lat), lng: parseFloat(lng), deals: [] };
+                stops[disp].deals.push(title);
+            });
+
+            // Sort stops by nearest-neighbor from HQ
+            const sorted = [];
+            const remaining = Object.entries(stops);
+            let curLat = HQ_LAT, curLng = HQ_LNG;
+
+            while (remaining.length > 0) {
+                let bestIdx = 0, bestDist = Infinity;
+                for (let i = 0; i < remaining.length; i++) {
+                    const s = remaining[i][1];
+                    const d = Math.sqrt(Math.pow(s.lat - curLat, 2) + Math.pow(s.lng - curLng, 2));
+                    if (d < bestDist) { bestDist = d; bestIdx = i; }
+                }
+                const [name, data] = remaining.splice(bestIdx, 1)[0];
+                sorted.push({ name, ...data });
+                curLat = data.lat;
+                curLng = data.lng;
+            }
+
+            // Build route stops HTML
+            const stopsDiv = document.getElementById('routeStops');
+            stopsDiv.innerHTML = sorted.map((s, i) =>
+                '<div class="route-stop"><span class="stop-num">' + (i+1) + '</span><strong>' + s.name + '</strong><br>' +
+                '<span style="color:#666;font-size:12px;margin-left:32px;">' + s.deals.join(', ') + '</span></div>'
+            ).join('');
+
+            // Build Google Maps directions URL
+            const waypoints = sorted.map(s => s.lat + ',' + s.lng);
+            const mapsUrl = 'https://www.google.com/maps/dir/' + HQ_LAT + ',' + HQ_LNG + '/' + waypoints.join('/');
+            document.getElementById('routeLink').href = mapsUrl;
+
+            document.getElementById('routePanel').classList.add('open');
+            document.getElementById('routeOverlay').classList.add('open');
+        }
+
+        function closeRoutePanel() {
+            document.getElementById('routePanel').classList.remove('open');
+            document.getElementById('routeOverlay').classList.remove('open');
+        }
+
+        let currentRunner = 'Jared';
+
+        function pickRunner(name) {
+            currentRunner = name;
+            document.getElementById('runnerJared').classList.toggle('active', name === 'Jared');
+            document.getElementById('runnerNicole').classList.toggle('active', name === 'Nicole');
+            document.getElementById('runnerLabel').textContent = name + ' is making The Weed Run today';
+        }
+
+        function clearCart() {
+            cart.clear();
+            document.querySelectorAll('.cart-btn.selected').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('.deal-card.in-cart').forEach(c => c.classList.remove('in-cart'));
+            updateCartUI();
+            closeRoutePanel();
+        }
+
         // Category filtering
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {

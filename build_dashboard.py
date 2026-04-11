@@ -250,14 +250,23 @@ def build_html(deals, generated_at):
                 desc_lines = deal["description"].replace("\n", "<br>")
                 desc_html = f'<p class="deal-desc">{desc_lines}</p>'
 
+            # Find closest location for this dispensary chain
+            closest_lat, closest_lng = JARED_LAT, JARED_LNG
+            chain_key_deal = deal["dispensary_name"].lower().strip()
+            locs = NEARBY_LOCATIONS.get(chain_key_deal, [])
+            if locs:
+                best = min(locs, key=lambda l: haversine(JARED_LAT, JARED_LNG, l[3], l[4]))
+                closest_lat, closest_lng = best[3], best[4]
+
             cards_html.append(f'''
-            <div class="deal-card" data-category="{deal['category_name'].lower()}">
+            <div class="deal-card" data-category="{deal['category_name'].lower()}" data-disp="{deal['dispensary_name']}" data-lat="{closest_lat}" data-lng="{closest_lng}">
                 {img_html}
                 <div class="deal-content">
                     <div class="deal-header">
                         <span class="category-tag" style="background:{deal['category_color']}20; color:{deal['category_color']}">{deal['category_name']}</span>
                         {badge}
                         {verified}
+                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">{deal['title']}</h3>
                     {desc_html}
@@ -266,7 +275,7 @@ def build_html(deals, generated_at):
 
         website_link = ""
         if disp["website"]:
-            website_link = f'<a href="{disp["website"]}" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower — Click Here To Order Now</a>'
+            website_link = f'<a href="{disp["website"]}" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower &mdash; Click Here To Order Now</a>'
 
         standing_deals = ""
         if disp["description"]:
@@ -674,6 +683,174 @@ def build_html(deals, generated_at):
             color: var(--text);
         }}
 
+        .cart-btn {{
+            margin-left: auto;
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: all 0.15s;
+        }}
+
+        .cart-btn.selected {{
+            opacity: 1;
+            background: var(--accent);
+            border-color: var(--accent);
+        }}
+
+        .deal-card.in-cart {{
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(34,197,94,0.3);
+        }}
+
+        .floating-cart {{
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent);
+            color: #fff;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 200;
+            border: none;
+        }}
+
+        .floating-cart.visible {{
+            display: flex;
+        }}
+
+        .cart-count {{
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }}
+
+        .route-panel {{
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 2px solid var(--accent);
+            border-radius: 16px 16px 0 0;
+            padding: 20px;
+            z-index: 300;
+            display: none;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+        }}
+
+        .route-panel.open {{
+            display: block;
+        }}
+
+        .route-panel h3 {{
+            font-size: 20px;
+            margin-bottom: 4px;
+            color: var(--text);
+        }}
+
+        .runner-picker {{
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }}
+
+        .runner-btn {{
+            flex: 1;
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: var(--surface);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+        }}
+
+        .runner-btn.active {{
+            border-color: var(--accent);
+            background: rgba(34,197,94,0.1);
+        }}
+
+        .route-stop {{
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }}
+
+        .route-stop .stop-num {{
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 8px;
+        }}
+
+        .route-btn {{
+            display: block;
+            width: 100%;
+            padding: 14px;
+            margin-top: 16px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }}
+
+        .route-close {{
+            float: right;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }}
+
+        .route-overlay {{
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 250;
+            display: none;
+        }}
+
+        .route-overlay.open {{
+            display: block;
+        }}
+
         /* Light mode only */
     </style>
 </head>
@@ -710,7 +887,119 @@ def build_html(deals, generated_at):
         <p>Made with &#10084;&#65039; by Rob</p>
     </footer>
 
+    <button class="floating-cart" id="floatingCart" onclick="openRoutePanel()">
+        &#128663;
+        <span class="cart-count" id="cartCount">0</span>
+    </button>
+
+    <div class="route-overlay" id="routeOverlay" onclick="closeRoutePanel()"></div>
+    <div class="route-panel" id="routePanel">
+        <button class="route-close" onclick="closeRoutePanel()">&times;</button>
+        <h3>&#127807; The Weed Run</h3>
+        <div class="runner-picker">
+            <button class="runner-btn active" id="runnerJared" onclick="pickRunner('Jared')">&#128587;&#8205;&#9794;&#65039; Jared's Run</button>
+            <button class="runner-btn" id="runnerNicole" onclick="pickRunner('Nicole')">&#128587;&#8205;&#9792;&#65039; Nicole's Run</button>
+        </div>
+        <p id="runnerLabel" style="font-size:13px; color:#666; margin-bottom:12px;">Jared is making The Weed Run today</p>
+        <div id="routeStops"></div>
+        <a id="routeLink" class="route-btn" target="_blank" rel="noopener">&#128663; Start The Weed Run in Google Maps</a>
+        <button class="route-btn" style="background:#ef4444; margin-top:8px;" onclick="clearCart()">Clear All</button>
+    </div>
+
     <script>
+        const HQ_LAT = {JARED_LAT};
+        const HQ_LNG = {JARED_LNG};
+        const cart = new Set();
+
+        function toggleCart(btn) {{
+            const card = btn.closest('.deal-card');
+            const key = card.dataset.disp + '|' + card.dataset.lat + '|' + card.dataset.lng;
+            const title = card.querySelector('.deal-title').textContent;
+
+            if (cart.has(key + '|' + title)) {{
+                cart.delete(key + '|' + title);
+                btn.classList.remove('selected');
+                card.classList.remove('in-cart');
+            }} else {{
+                cart.add(key + '|' + title);
+                btn.classList.add('selected');
+                card.classList.add('in-cart');
+            }}
+            updateCartUI();
+        }}
+
+        function updateCartUI() {{
+            const count = cart.size;
+            document.getElementById('cartCount').textContent = count;
+            document.getElementById('floatingCart').classList.toggle('visible', count > 0);
+        }}
+
+        function openRoutePanel() {{
+            // Group by dispensary and get unique stops
+            const stops = {{}};
+            cart.forEach(item => {{
+                const [disp, lat, lng, ...titleParts] = item.split('|');
+                const title = titleParts.join('|');
+                if (!stops[disp]) stops[disp] = {{ lat: parseFloat(lat), lng: parseFloat(lng), deals: [] }};
+                stops[disp].deals.push(title);
+            }});
+
+            // Sort stops by nearest-neighbor from HQ
+            const sorted = [];
+            const remaining = Object.entries(stops);
+            let curLat = HQ_LAT, curLng = HQ_LNG;
+
+            while (remaining.length > 0) {{
+                let bestIdx = 0, bestDist = Infinity;
+                for (let i = 0; i < remaining.length; i++) {{
+                    const s = remaining[i][1];
+                    const d = Math.sqrt(Math.pow(s.lat - curLat, 2) + Math.pow(s.lng - curLng, 2));
+                    if (d < bestDist) {{ bestDist = d; bestIdx = i; }}
+                }}
+                const [name, data] = remaining.splice(bestIdx, 1)[0];
+                sorted.push({{ name, ...data }});
+                curLat = data.lat;
+                curLng = data.lng;
+            }}
+
+            // Build route stops HTML
+            const stopsDiv = document.getElementById('routeStops');
+            stopsDiv.innerHTML = sorted.map((s, i) =>
+                '<div class="route-stop"><span class="stop-num">' + (i+1) + '</span><strong>' + s.name + '</strong><br>' +
+                '<span style="color:#666;font-size:12px;margin-left:32px;">' + s.deals.join(', ') + '</span></div>'
+            ).join('');
+
+            // Build Google Maps directions URL
+            const waypoints = sorted.map(s => s.lat + ',' + s.lng);
+            const mapsUrl = 'https://www.google.com/maps/dir/' + HQ_LAT + ',' + HQ_LNG + '/' + waypoints.join('/');
+            document.getElementById('routeLink').href = mapsUrl;
+
+            document.getElementById('routePanel').classList.add('open');
+            document.getElementById('routeOverlay').classList.add('open');
+        }}
+
+        function closeRoutePanel() {{
+            document.getElementById('routePanel').classList.remove('open');
+            document.getElementById('routeOverlay').classList.remove('open');
+        }}
+
+        let currentRunner = 'Jared';
+
+        function pickRunner(name) {{
+            currentRunner = name;
+            document.getElementById('runnerJared').classList.toggle('active', name === 'Jared');
+            document.getElementById('runnerNicole').classList.toggle('active', name === 'Nicole');
+            document.getElementById('runnerLabel').textContent = name + ' is making The Weed Run today';
+        }}
+
+        function clearCart() {{
+            cart.clear();
+            document.querySelectorAll('.cart-btn.selected').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('.deal-card.in-cart').forEach(c => c.classList.remove('in-cart'));
+            updateCartUI();
+            closeRoutePanel();
+        }}
+
         // Category filtering
         document.querySelectorAll('.filter-btn').forEach(btn => {{
             btn.addEventListener('click', () => {{
