@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>The Weed We Need</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0f0f0f;
+            --surface: #1a1a1a;
+            --surface2: #252525;
+            --text: #e5e5e5;
+            --text-muted: #888;
+            --accent: #22c55e;
+            --accent-dim: #16a34a;
+            --border: #2a2a2a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 16px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stats {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .refresh-btn {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .refresh-btn:active {
+            background: var(--accent-dim);
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .filters::-webkit-scrollbar { display: none; }
+
+        .filter-btn {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .main {
+            padding: 16px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .dispensary-section {
+            margin-bottom: 28px;
+        }
+
+        .disp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+
+        .disp-info {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .disp-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            background: var(--surface2);
+        }
+
+        .disp-name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .disp-standing {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        .disp-link {
+            font-size: 13px;
+            color: var(--accent);
+            text-decoration: none;
+            white-space: nowrap;
+            flex-shrink: 0;
+            padding-top: 4px;
+        }
+
+        .hq-section {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .hq-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 2px;
+        }
+
+        .hq-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .hq-map {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .locations {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+
+        .location-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .location-link:active {
+            background: var(--accent-dim);
+        }
+
+        .loc-distance {
+            font-weight: 700;
+            color: var(--accent);
+            min-width: 50px;
+        }
+
+        .loc-addr {
+            flex: 1;
+            color: var(--text-muted);
+        }
+
+        .loc-arrow {
+            color: var(--accent);
+            font-size: 16px;
+        }
+
+        .deals-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .deal-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .deal-card.hidden {
+            display: none;
+        }
+
+        .deal-img {
+            width: 100%;
+            max-height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .deal-content {
+            padding: 12px 14px;
+        }
+
+        .deal-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .category-tag {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .badge-pct {
+            background: #ef444420;
+            color: #ef4444;
+        }
+
+        .badge-amt {
+            background: #f59e0b20;
+            color: #f59e0b;
+        }
+
+        .verified {
+            color: var(--accent);
+            font-size: 14px;
+        }
+
+        .deal-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+
+        .deal-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px 16px 40px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #f5f5f5;
+                --surface: #fff;
+                --surface2: #eee;
+                --text: #1a1a1a;
+                --text-muted: #666;
+                --border: #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-top">
+            <div>
+                <h1>&#127807; The Weed We Need</h1>
+                <p class="stats">Jared &amp; Nicole's Daily Deal Report &middot; 14 deals &middot; 10 dispensaries</p>
+                <p class="stats">Updated April 11, 2026 at 02:22 AM</p>
+            </div>
+            <button class="refresh-btn" onclick="location.reload()">&#8635; Refresh</button>
+        </div>
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="concentrates">Concentrates</button><button class="filter-btn" data-filter="flower">Flower</button><button class="filter-btn" data-filter="pre-rolls">Pre-rolls</button><button class="filter-btn" data-filter="tinctures">Tinctures</button><button class="filter-btn" data-filter="vapes">Vapes</button>
+        </div>
+    </header>
+
+    <main class="main" id="deals-container">
+        <section class="hq-section">
+            <h2 class="hq-title">&#128205; Mission Control</h2>
+            <p class="hq-subtitle">All distances measured from HQ</p>
+            <div class="hq-map">
+                <iframe
+                    src="https://maps.google.com/maps?q=27.418,-80.353&t=k&z=18&output=embed&markers=27.418,-80.353"
+                    width="100%"
+                    height="200"
+                    style="border:0; border-radius:12px;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </section>
+
+        
+        <section class="dispensary-section" data-dispensary="ayr wellness">
+            <div class="disp-header">
+                <div class="disp-info">
+                    <img src="https://www.google.com/s2/favicons?domain=ayrwellness.com&sz=256" alt="" class="disp-logo" onerror="this.style.display='none'">
+                    <div>
+                        <h2 class="disp-name">AYR Wellness</h2>
+                        <p class="disp-standing">first purchase: 50% Off • veterans: 25% Off • seniors: 15% Off (55+)</p>
+                    </div>
+                </div>
+                <a href="https://ayrdispensaries.com/florida/discount-programs/" target="_blank" rel="noopener" class="disp-link">Visit Site &rarr;</a>
+            </div>
+            
+            <div class="deals-grid">
+                
+            <div class="deal-card" data-category="concentrates">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_6_2056072509.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#8b5cf620; color:#8b5cf6">Concentrates</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                    </div>
+                    <h3 class="deal-title">Big Deals on Flower, Vapes, Concentrates & Pre-Rolls</h3>
+                    <p class="deal-desc">• Spend $300 April 1-20 & Earn $25 Off $100<br>• Spend $500 April 1-30 & Earn 30% Stackable Coupon<br>• Buy 4 Units of Concentrates, Receive a Coupon for 1 $15 Concentrate of Your Choice<br>• Redeemable Only April 13-19<br>• 5 for $100 Kynd Flower<br>• 3 for $90 Dompen Vape Cartridges | 1G<br>• Shop Dompen Vapes<br>• Shop 1g Pre-Rolls<br>• 14 for $80 Kynd Pre-Rolls | 1G<br>• 14 for $60 Later Days Pre-Rolls | 1G<br>• 4 for $60 Later Days Flower | 3.5g<br>• 2 for $40 Kynd Truckee Thunder Whole Flower | 3.5g<br>• Shop Truckee Thunder<br>• Coupon is a one-time use per person<br>• Discounts are valid for qualifying rewards members only<br>• Must be redeemed between 4/1-4/19<br>• Ask your budtender for details</p>
+                </div>
+            </div>
+            </div>
+        </section>
+        <section class="dispensary-section" data-dispensary="curaleaf">
+            <div class="disp-header">
+                <div class="disp-info">
+                    <img src="https://www.google.com/s2/favicons?domain=curaleaf.com&sz=256" alt="" class="disp-logo" onerror="this.style.display='none'">
+                    <div>
+                        <h2 class="disp-name">Curaleaf</h2>
+                        <p class="disp-standing">first purchase: 40% Off • veterans: 20% Off • seniors: 10% Off (55+) • birthday: 25% Off • delivery: Available statewide</p>
+                    </div>
+                </div>
+                <a href="https://curaleaf.com" target="_blank" rel="noopener" class="disp-link">Visit Site &rarr;</a>
+            </div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.418,-80.353/27.432,-80.395" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">2.8 mi</span> <span class="loc-addr">5192 Okeechobee Rd, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.418,-80.353/27.283,-80.389" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">9.6 mi</span> <span class="loc-addr">1703 NW St Lucie West Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.418,-80.353/27.262,-80.237" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">12.9 mi</span> <span class="loc-addr">3458 NW Federal Hwy, Jensen Beach</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.418,-80.353/27.154,-80.2183" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">20.0 mi</span> <span class="loc-addr">4203 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
+                
+            <div class="deal-card" data-category="flower">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_36_1369919445.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                    </div>
+                    <h3 class="deal-title">Mix & Match, BOGO, and Storewide Savings</h3>
+                    <p class="deal-desc">• Mention FL CANNABIS DEALS to your budtender & receive an extra 10% OFF<br>• Maximum discount not to exceed 60%<br>• Mix & Match 1/2 Oz $55<br>• Buy a Pineapple Express Briq 2 get a 0.5g Curaleaf cart for $10 PEN-APPLE EXPRESS BUNDLE<br>• 1g Pre-Rolls 6 for $31<br>• Edibles 60% OFF<br>• 40% OFF STOREWIDE!<br>• Vapes Starting at 35% OFF<br>• TRY OUR $15+ MENU<br>• Multiple Products. All Categories. Starting at $15+</p>
+                </div>
+            </div>
+            </div>
+        </section>
+        <section class="dispensary-section" data-dispensary="fluent">
+            <div class="disp-header">
+                <div class="disp-info">
+                    <img src="https://www.google.com/s2/favicons?domain=getfluent.com&sz=256" alt="" class="disp-logo" onerror="this.style.display='none'">
+                    <div>
+                        <h2 class="disp-name">Fluent</h2>
+                        <p class="disp-standing">first purchase: 50% Off • veterans: 20% Off • seniors: 20% Off (55+) • birthday: $25 Off $50 • delivery: Free over $200</p>
+                    </div>
+                </div>
+                <a href="https://getfluent.com/promotions/" target="_blank" rel="noopener" class="disp-link">Visit Site &rarr;</a>
+            </div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.418,-80.353/27.422,-80.331" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">1.4 mi</span> <span class="loc-addr">2509 S US Hwy 1, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
+                
+            <div class="deal-card" data-category="flower">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_8_1454301720.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                    </div>
+                    <h3 class="deal-title">Weekly Deals & Higher Hour Specials</h3>
+                    <p class="deal-desc">• 4/10 - 4/16: Everyday is FOUR TWENTY<br>• Higher Hour Special: Friday 4/10 4:20pm-Close<br>• Higher Hour Special: ALL EIGHTHS: $14<br>• Knack: Choose any Eighth $18 (Reg $35)<br>• Bag-O: Choose any Half Oz. $55 (Reg $90)<br>• Freedom Town: Choose any Eighth $20 (Reg $40)<br>• ALL 0.5G CARTRIDGES: $20</p>
+                </div>
+            </div>
+            <div class="deal-card" data-category="flower">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_15_527282514.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                    </div>
+                    <h3 class="deal-title">Eighths for $18 & $22, Vapes for $25</h3>
+                    <p class="deal-desc">• Knack: Choose any Eighth for $18 (Reg $35)<br>• Moods Black: Mini 1g AIO for $35 (Reg $65)<br>• Freedom Town: Choose any Eighth for $22 (Reg $40)<br>• Moods: Mini 1g AIO for $30 (Reg $60)<br>• Vape Carts: All 1g Carts for $25</p>
+                </div>
+            </div>
+            <div class="deal-card" data-category="pre-rolls">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_6_1267086510.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#ef444420; color:#ef4444">Pre-rolls</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                    </div>
+                    <h3 class="deal-title">Higher Hour Deals: Pre-Rolls, Eighths, Edibles & More!</h3>
+                    <p class="deal-desc">• 4X Rewards Points on all orders during Higher Hour (4:20 PM - Close)<br>• ALL 1G PRE-ROLLS: $4.20 (4/11)<br>• ALL EIGHTHS: $14 (4/10)<br>• CHOCOLATES & GELS: $4.20 (4/12)<br>• GET 2 BAG-O 7G GROUND FLOWER: $50 (4/13)<br>• GET 2 BAG-O 14G WHOLE FLOWER: $90 (4/13)<br>• ALL 1G PRE-ROLLS: $4.20 (4/11)<br>• 4X REWARDS POINTS ON ALL ORDERS DURING HIGHER HOUR (4:20PM - CLOSE)</p>
+                </div>
+            </div>
+            </div>
+        </section>
+        <section class="dispensary-section" data-dispensary="green dragon">
+            <div class="disp-header">
+                <div class="disp-info">
+                    <img src="https://www.google.com/s2/favicons?domain=greendragon.com&sz=256" alt="" class="disp-logo" onerror="this.style.display='none'">
+                    <div>
+                        <h2 class="disp-name">Green Dragon</h2>
+                        <p class="disp-standing">first purchase: 50% Off • veterans: 22% Off • seniors: 20% Off (55+) • birthday: Free Joint • referral: $20 Credit</p>
+                    </div>
+                </div>
+                <a href="https://www.greendragonfl.com/" target="_blank" rel="noopener" class="disp-link">Visit Site &rarr;</a>
+            </div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.418,-80.353/27.425,-80.33" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">1.5 mi</span> <span class="loc-addr">2217 S US Hwy 1, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.418,-80.353/27.175,-80.227" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">18.5 mi</span> <span class="loc-addr">2285 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
+                
+            <div class="deal-card" data-category="concentrates">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_7_1025661717.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#8b5cf620; color:#8b5cf6">Concentrates</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                    </div>
+                    <h3 class="deal-title">Double Points & $20 Cloud Sugar</h3>
+                    <p class="deal-desc">• TODAY ONLY DOUBLE POINTS WITH PURCHASE OF EVERYDAY WAX<br>• APRIL 6 - 12<br>• $20 CLOUD SUGAR<br>• SELECT STRAINS</p>
+                </div>
+            </div>
+            </div>
+        </section>
+        <section class="dispensary-section" data-dispensary="grow healthy">
+            <div class="disp-header">
+                <div class="disp-info">
+                    <img src="https://www.google.com/s2/favicons?domain=growhealthy.com&sz=256" alt="" class="disp-logo" onerror="this.style.display='none'">
+                    <div>
+                        <h2 class="disp-name">Grow Healthy</h2>
+                        <p class="disp-standing">first purchase: 50% Off + Free Pre-roll • veterans: 30% Off • hardship: 20% Off • birthday: $10 Off $50 • delivery: Free over $75</p>
+                    </div>
+                </div>
+                <a href="https://growhealthy.com/discounts/" target="_blank" rel="noopener" class="disp-link">Visit Site &rarr;</a>
+            </div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.418,-80.353/27.154,-80.214" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">20.1 mi</span> <span class="loc-addr">3462 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
+                
+            <div class="deal-card" data-category="flower">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_37_1265239468.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                    </div>
+                    <h3 class="deal-title">Flower Deals, Carts, Pre-Rolls & Storewide Savings!</h3>
+                    <p class="deal-desc">• MPX SKUNK SELECT 3.5g Flower 35% THC $35<br>• GrowHealthy 2 for $35<br>• MPX SELECT 2 for $45<br>• THE VAULT SUNSHINE STATE 2 for $55<br>• $10 - 0.5G BLACK LABEL DISTILLATE CARTS<br>• $9 - 1G PREMIUM BRAND PRE-ROLLS<br>• $7 - 1G MPX PRE-ROLLS<br>• $6 - 0.7G GH PRE-ROLLS<br>• UP TO 55% OFF STOREWIDE</p>
+                </div>
+            </div>
+            </div>
+        </section>
+        <section class="dispensary-section" data-dispensary="müv">
+            <div class="disp-header">
+                <div class="disp-info">
+                    <img src="https://www.google.com/s2/favicons?domain=muvfl.com&sz=256" alt="" class="disp-logo" onerror="this.style.display='none'">
+                    <div>
+                        <h2 class="disp-name">Müv</h2>
+                        <p class="disp-standing">first purchase: 50% Off • veterans: 20% Off • seniors: 15% Off (55+) • birthday: Free Pre-roll or Edible • delivery: Available select locations</p>
+                    </div>
+                </div>
+                <a href="https://www.muvfl.com" target="_blank" rel="noopener" class="disp-link">Visit Site &rarr;</a>
+            </div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.418,-80.353/27.436,-80.3255" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">2.1 mi</span> <span class="loc-addr">1006 S US Hwy 1, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.418,-80.353/27.2633,-80.3944" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">11.0 mi</span> <span class="loc-addr">1564 NW Gatlin Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.418,-80.353/27.213,-80.277" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">14.9 mi</span> <span class="loc-addr">3550 NW Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
+                
+            <div class="deal-card" data-category="flower">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_6_1453378199.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                    </div>
+                    <h3 class="deal-title">Buy 1 Get 1 Flower & Edibles, 50% Off Extracts</h3>
+                    <p class="deal-desc">• BUY 1, GET 1 Flower<br>• BUY 1, GET 1 Edibles<br>• 50% OFF Extracts<br>• 50% OFF 2 or More 1g & 2g Vapes<br>• 40% OFF STOREWIDE<br>• *Excludes Savvy flower and flower over 28% THC.<br>• *Exclusions may apply.<br>• April 10-12</p>
+                </div>
+            </div>
+            </div>
+        </section>
+        <section class="dispensary-section" data-dispensary="planet 13">
+            <div class="disp-header">
+                <div class="disp-info">
+                    <img src="/logos/planet13-favicon.png" alt="" class="disp-logo" onerror="this.style.display='none'">
+                    <div>
+                        <h2 class="disp-name">Planet 13</h2>
+                        <p class="disp-standing">first purchase: 50% Off + Future $0.01 Products • veterans: 40% Off • seniors: 25% Off (55+) • industry: 25% Off (Mon-Wed) • compassionate: 20% Off • delivery: $50 Minimum</p>
+                    </div>
+                </div>
+                <a href="https://planet13.com/" target="_blank" rel="noopener" class="disp-link">Visit Site &rarr;</a>
+            </div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.418,-80.353/27.215,-80.274" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">14.8 mi</span> <span class="loc-addr">3501 NW Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
+                
+            <div class="deal-card" data-category="tinctures">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_6_1480160308.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#10b98120; color:#10b981">Tinctures</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                    </div>
+                    <h3 class="deal-title">Power Hour Deals: 50% Off & Special Prices</h3>
+                    <p class="deal-desc">• Power Hour: 4:20PM - Close (7PM)<br>• 50% OFF MEDIZIN TINCTURES<br>• $29 PLANET 13 1G COLD CURE LIVE ROSIN & JAM<br>• $9 PLANET 13 RSO EDIBLES</p>
+                </div>
+            </div>
+            <div class="deal-card" data-category="vapes">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_35_1264315947.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#0ea5e920; color:#0ea5e9">Vapes</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                    </div>
+                    <h3 class="deal-title">BOGO FREE Vapes, Flower, Edibles & More</h3>
+                    <p class="deal-desc">• B1G1 FREE 0.5G VAPES (Distillate only. Excludes Products Powered by Oni.)<br>• B1G1 FREE DREAMLAND CHOCOLATES<br>• B2G1 FREE 0.5G & 1G PRE-ROLLS (Excludes packs and Leaf & Vine)<br>• $23 for 1G DISTILLATE VAPES<br>• planet 13 3 FOR $55 TIER 2 | 3.5G FLOWER<br>• planet 13 4 FOR $60 TIER 2 | 3.5G FLOWER<br>• 20% OFF planet 13 & MEDIZIN FLOWER (Including 3.5g, 7g, 14g)<br>• 30% OFF planet 13 EDIBLES<br>• 2 FOR $50 TINCTURES & TOPICALS<br>• $65 MEDIZIN BUNDLE (3.5G FLOWER & COLD CURE ROSIN)<br>• *FOAM strain only. Excludes products powered by ONI.</p>
+                </div>
+            </div>
+            </div>
+        </section>
+        <section class="dispensary-section" data-dispensary="sanctuary">
+            <div class="disp-header">
+                <div class="disp-info">
+                    <img src="https://www.google.com/s2/favicons?domain=sanctuarymed.com&sz=256" alt="" class="disp-logo" onerror="this.style.display='none'">
+                    <div>
+                        <h2 class="disp-name">Sanctuary</h2>
+                        <p class="disp-standing">first purchase: 60% Off Up To $150 • veterans: 10% Off Thursdays • seniors: 5% Off Wednesdays (65+) • birthday: $5 Small Bud or Free 0.5g Vape • industry: 5% Off Tuesdays • milestone: Free Edible at 25 visits</p>
+                    </div>
+                </div>
+                <a href="https://www.sanctuarymed.com/#about-us/" target="_blank" rel="noopener" class="disp-link">Visit Site &rarr;</a>
+            </div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.418,-80.353/27.433,-80.413" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">3.8 mi</span> <span class="loc-addr">5774 Okeechobee Rd, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
+                
+            <div class="deal-card" data-category="flower">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_8_1482930871.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                    </div>
+                    <h3 class="deal-title">Doorbuster Deals, Flash Sales & Build Your Own Bundle</h3>
+                    <p class="deal-desc">• Sanctuary Signature Flower: ANY 2 FOR $50<br>• Sanctuary 7G Mini Buds: ANY 2 FOR $55<br>• Sanctuary Naturals Flower: ANY 3 FOR $55<br>• Sanctuary 3.5G Flower 27% THC or Less: PICK 3 FOR $45<br>• 1G Pre-Rolls: ANY 6 FOR $30<br>• 5PK 1G Pre-Rolls: ANY 2 FOR $36<br>• Ground Flower: 1/2 OZ $32<br>• Ground Flower: 1 OZ $58<br>• 1G Liquid Rosin Live! & 1G Resin All-in-One Vapes: EACH FOR $20<br>• 50% OFF ENTIRE STORE (Excluding Apparel, Accessories & Puffco Items)<br>• 0.5G Vapes: GET ANY 3 FOR $50<br>• Any Edible: CHOOSE 4 FOR $48<br>• Spend $60, Get a Free T-Shirt or Hat!<br>• Build Your Own Bundle: ANY 3 ITEMS FOR $90 (Excluding Accessories, HQ Tinctures, 1g Ryzin & Liquid Rosin Live! 4G Flower, 4G-5G Concentrates)<br>• Spend $60, Get a 1G Live Rosin for Only $35<br>• Flash Sale in Full Bloom From 1PM Until Close<br>• Spend $75, Get (10) 1G Pre-Rolls for Only $10<br>• 1G Crumble: EACH $30<br>• 1G Crumble: 2 FOR $50</p>
+                </div>
+            </div>
+            </div>
+        </section>
+        <section class="dispensary-section" data-dispensary="surterra">
+            <div class="disp-header">
+                <div class="disp-info">
+                    <img src="https://www.google.com/s2/favicons?domain=surterra.com&sz=256" alt="" class="disp-logo" onerror="this.style.display='none'">
+                    <div>
+                        <h2 class="disp-name">Surterra</h2>
+                        <p class="disp-standing">first purchase: 60% Off (Max $250) • second purchase: 60% Off (Max $250) • veterans: 15% Off + Double Points • seniors: 15-30% Off (55+) • birthday: Free Pre-roll or Chews</p>
+                    </div>
+                </div>
+                <a href="https://surterra.com" target="_blank" rel="noopener" class="disp-link">Visit Site &rarr;</a>
+            </div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.418,-80.353/27.264,-80.329" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">10.7 mi</span> <span class="loc-addr">1752 SW Gatlin Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
+                
+            <div class="deal-card" data-category="flower">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_6_1451531157.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                    </div>
+                    <h3 class="deal-title">Free Eighth With THC Purchase - Limited Time!</h3>
+                    <p class="deal-desc">• Shop from 5 - 7pm today and get a FREE Eighth with any THC purchase!</p>
+                </div>
+            </div>
+            <div class="deal-card" data-category="flower">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_24_2038125827.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                    </div>
+                    <h3 class="deal-title">Get Two Free Eighths When You Purchase 2 oz</h3>
+                    <p class="deal-desc">• Get TWO FREE EIGHTHS When You Purchase 2 oz<br>• This April, buy any 2 oz of whole flower and earn TWO FREE EIGHTHS as a loyalty reward in May.</p>
+                </div>
+            </div>
+            </div>
+        </section>
+        <section class="dispensary-section" data-dispensary="trulieve">
+            <div class="disp-header">
+                <div class="disp-info">
+                    <img src="https://www.google.com/s2/favicons?domain=trulieve.com&sz=256" alt="" class="disp-logo" onerror="this.style.display='none'">
+                    <div>
+                        <h2 class="disp-name">Trulieve</h2>
+                        <p class="disp-standing">first purchase: 50% Off • veterans: 20% Off • seniors: 10% Off (55+) • birthday: Free Pre-roll • loyalty: Points on every purchase</p>
+                    </div>
+                </div>
+                <a href="https://www.trulieve.com" target="_blank" rel="noopener" class="disp-link">Visit Site &rarr;</a>
+            </div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.418,-80.353/27.426,-80.33" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">1.5 mi</span> <span class="loc-addr">2200 S US Hwy 1, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.418,-80.353/27.278,-80.324" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">9.8 mi</span> <span class="loc-addr">1707 SE Port St Lucie Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.418,-80.353/27.2631,-80.3395" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">10.7 mi</span> <span class="loc-addr">1858 SW Gatlin Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.418,-80.353/27.185,-80.24" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">17.5 mi</span> <span class="loc-addr">2100 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.418,-80.353/27.171,-80.227" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">18.7 mi</span> <span class="loc-addr">2443 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
+                
+            <div class="deal-card" data-category="flower">
+                <img src="https://cannadealsfl.com/api/images/deal-images/image_6_1721781972.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
+                <div class="deal-content">
+                    <div class="deal-header">
+                        <span class="category-tag" style="background:#22c55e20; color:#22c55e">Flower</span>
+                        
+                        <span class="verified" title="Verified">&#10003;</span>
+                    </div>
+                    <h3 class="deal-title">Mix & Match, 2 for $50 Flower & More</h3>
+                    <p class="deal-desc">• Mix & Match: 3 for $105 on 1g Co2lors AIO, 1g Liquid Live Resin Cart, .5g Live Resin Carts, 300mg Capsules<br>• 3.5g Flower: 2 for $50<br>• 3.5g Flower: 2 for $50<br>• 3.5g Flower: $17.50<br>• 1g Co2lors AIO: Included in Mix & Match deal<br>• 1g Liquid Live Resin Cart: Included in Mix & Match deal<br>• 0.5g Live Resin Carts: Included in Mix & Match deal<br>• 300mg Capsules: Included in Mix & Match deal<br>• SweetTalk Classic Gummies: $10<br>• SweetTalk Fast Acting, RSO, and Live Resin Gummies: $15<br>• Gummies, Chocolate, Cookies and Brownies: $12.50<br>• Premium 3.5g Flower: 2 for $90<br>• Premium 3.5g Flower: 3 for $120<br>• 3.5g Flower: $20<br>• Rolling Tray FREE with any '.40 Roll One' purchase<br>• Available 4/10 Only</p>
+                </div>
+            </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>Data from <a href="https://cannadealsfl.com" target="_blank">CannaDealsFL</a></p>
+        <p>Made with &#10084;&#65039; by Rob</p>
+    </footer>
+
+    <script>
+        // Category filtering
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const filter = btn.dataset.filter;
+
+                document.querySelectorAll('.deal-card').forEach(card => {
+                    if (filter === 'all' || card.dataset.category === filter) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+
+                // Hide dispensary sections with no visible deals
+                document.querySelectorAll('.dispensary-section').forEach(section => {
+                    const visibleCards = section.querySelectorAll('.deal-card:not(.hidden)');
+                    section.style.display = visibleCards.length > 0 ? '' : 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
