@@ -313,14 +313,14 @@ def build_html(deals, generated_at):
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
 
         :root {{
-            --bg: #0f0f0f;
-            --surface: #1a1a1a;
-            --surface2: #252525;
-            --text: #e5e5e5;
-            --text-muted: #888;
+            --bg: #f5f5f5;
+            --surface: #fff;
+            --surface2: #eee;
+            --text: #1a1a1a;
+            --text-muted: #666;
             --accent: #22c55e;
             --accent-dim: #16a34a;
-            --border: #2a2a2a;
+            --border: #ddd;
         }}
 
         body {{
@@ -650,16 +650,7 @@ def build_html(deals, generated_at):
             color: var(--text);
         }}
 
-        @media (prefers-color-scheme: light) {{
-            :root {{
-                --bg: #f5f5f5;
-                --surface: #fff;
-                --surface2: #eee;
-                --text: #1a1a1a;
-                --text-muted: #666;
-                --border: #ddd;
-            }}
-        }}
+        /* Light mode only */
     </style>
 </head>
 <body>
