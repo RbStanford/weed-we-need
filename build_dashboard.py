@@ -282,7 +282,7 @@ def build_html(deals, generated_at):
                 <div class="disp-info">
                     <img src="{disp['logo']}" alt="" class="disp-logo" onerror="this.style.display='none'">
                     <div>
-                        <h2 class="disp-name">{disp_name}</h2>
+                        <h2 class="disp-name">{'<a href="' + disp["website"] + '" target="_blank" rel="noopener" class="disp-name-link">' + disp_name + '</a>' if disp["website"] else disp_name}</h2>
                         {standing_deals}
                     </div>
                 </div>
@@ -441,6 +441,13 @@ def build_html(deals, generated_at):
         .disp-name {{
             font-size: 18px;
             font-weight: 700;
+        }}
+
+        .disp-name-link {{
+            color: var(--text);
+            text-decoration: underline;
+            text-decoration-color: var(--accent);
+            text-underline-offset: 3px;
         }}
 
         .disp-standing {{
