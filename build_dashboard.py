@@ -266,7 +266,7 @@ def build_html(deals, generated_at):
 
         website_link = ""
         if disp["website"]:
-            website_link = f'<a href="{disp["website"]}" target="_blank" rel="noopener" class="disp-link">Visit Site &rarr;</a>'
+            website_link = f'<a href="{disp["website"]}" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower — Click Here To Order Now</a>'
 
         standing_deals = ""
         if disp["description"]:
@@ -464,6 +464,23 @@ def build_html(deals, generated_at):
             white-space: nowrap;
             flex-shrink: 0;
             padding-top: 4px;
+        }}
+
+        .disp-order-link {{
+            display: block;
+            text-align: center;
+            background: var(--accent);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            margin-bottom: 12px;
+        }}
+
+        .disp-order-link:active {{
+            opacity: 0.8;
         }}
 
         .hq-section {{
