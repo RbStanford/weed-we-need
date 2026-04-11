@@ -18,9 +18,9 @@ API_URL = "https://cannadealsfl.com/api/deals?limit=100&page=1"
 OUTPUT_DIR = Path(__file__).parent / "docs"
 OUTPUT_FILE = OUTPUT_DIR / "index.html"
 
-# Jared's home coordinates (S 25th St, Fort Pierce)
-JARED_LAT = 27.4180
-JARED_LNG = -80.3530
+# Jared's home: 4665 S 25th St, Fort Pierce, FL
+JARED_LAT = 27.4175
+JARED_LNG = -80.3535
 
 # Dispensary chains with locations within 20 miles of Jared
 # Source: Weedmaps discovery API, verified 2026-04-10
@@ -465,22 +465,45 @@ def build_html(deals, generated_at):
         }}
 
         .hq-title {{
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 22px;
+            font-weight: 800;
             color: var(--accent);
-            margin-bottom: 2px;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
         }}
 
         .hq-subtitle {{
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-muted);
             margin-bottom: 10px;
         }}
 
-        .hq-map {{
+        .hq-photo {{
+            position: relative;
             border-radius: 12px;
             overflow: hidden;
-            border: 1px solid var(--border);
+            border: 2px solid var(--accent);
+        }}
+
+        .hq-photo img {{
+            width: 100%;
+            display: block;
+        }}
+
+        .hq-badge {{
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: var(--accent);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border: 1px solid var(--accent);
+            white-space: nowrap;
         }}
 
         .locations {{
@@ -656,18 +679,11 @@ def build_html(deals, generated_at):
 
     <main class="main" id="deals-container">
         <section class="hq-section">
-            <h2 class="hq-title">&#128205; Mission Control</h2>
+            <h2 class="hq-title">&#128205; YOU ARE HERE</h2>
             <p class="hq-subtitle">All distances measured from HQ</p>
-            <div class="hq-map">
-                <iframe
-                    src="https://maps.google.com/maps?q={JARED_LAT},{JARED_LNG}&t=k&z=18&output=embed&markers={JARED_LAT},{JARED_LNG}"
-                    width="100%"
-                    height="200"
-                    style="border:0; border-radius:12px;"
-                    allowfullscreen=""
-                    loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade">
-                </iframe>
+            <div class="hq-photo">
+                <img src="jared-hq.png" alt="Jared and Nicole's HQ">
+                <div class="hq-badge">&#127807; HQ &middot; 4665 S 25th St</div>
             </div>
         </section>
 
