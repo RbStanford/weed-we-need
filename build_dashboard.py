@@ -539,6 +539,32 @@ def build_html(deals, generated_at):
             white-space: nowrap;
         }}
 
+        .how-it-works {{
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }}
+
+        .how-it-works h3 {{
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text);
+        }}
+
+        .how-it-works ol {{
+            padding-left: 20px;
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }}
+
+        .how-it-works li {{
+            margin-bottom: 4px;
+        }}
+
         .locations {{
             display: flex;
             flex-direction: column;
@@ -683,18 +709,16 @@ def build_html(deals, generated_at):
 
         .cart-btn {{
             margin-left: auto;
-            background: none;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 3px 8px;
-            font-size: 16px;
+            background: #f0fdf4;
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 18px;
             cursor: pointer;
-            opacity: 0.5;
             transition: all 0.15s;
         }}
 
         .cart-btn.selected {{
-            opacity: 1;
             background: var(--accent);
             border-color: var(--accent);
         }}
@@ -871,6 +895,16 @@ def build_html(deals, generated_at):
         <section class="hq-section">
             <h2 class="hq-title">&#128205; YOU ARE HERE</h2>
             <p class="hq-subtitle">All distances measured from 4665 S 25th St, Fort Pierce</p>
+        </section>
+
+        <section class="how-it-works">
+            <h3>&#128663; How The Weed Run Works</h3>
+            <ol>
+                <li>Browse the deals below — tap the green <strong>&#128722;</strong> button on any deal you want</li>
+                <li>A floating &#128663; button appears in the bottom right — that's your run</li>
+                <li>Tap it to see your picks, choose <strong>My Run</strong> or <strong>Our Run</strong></li>
+                <li>Hit <strong>"Start The Weed Run"</strong> and Google Maps opens with the fastest route to every stop</li>
+            </ol>
         </section>
 
         {"".join(dispensary_sections)}
