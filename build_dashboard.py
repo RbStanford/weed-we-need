@@ -979,7 +979,8 @@ def build_html(deals, generated_at):
             <button class="runner-btn active" id="runnerMe" onclick="pickRunner('I am')">&#128587; My Run</button>
             <button class="runner-btn" id="runnerOther" onclick="pickRunner('We are')">&#128107; Our Run</button>
         </div>
-        <p id="runnerLabel" style="font-size:13px; color:#666; margin-bottom:12px;">I am making The Weed Run today</p>
+        <p id="runnerLabel" style="font-size:13px; color:#666; margin-bottom:4px;">I am making The Weed Run today</p>
+        <p id="routeSummary" style="font-size:14px; font-weight:700; color:#1a1a1a; margin-bottom:12px;"></p>
         <div id="routeStops"></div>
         <a id="routeLink" class="route-btn" target="_blank" rel="noopener">&#128663; Start The Weed Run in Google Maps</a>
         <button class="route-btn" style="background:#ef4444; margin-top:8px;" onclick="clearCart()">Clear All</button>
@@ -988,40 +989,46 @@ def build_html(deals, generated_at):
     <script>
         const HQ_LAT = {JARED_LAT};
         const HQ_LNG = {JARED_LNG};
-        const cart = new Map(); // key: "disp|lat|lng|itemText" -> true
+        // Cart stores objects instead of string keys to avoid delimiter bugs
+        let cartItems = [];
 
         function toggleItem(el) {{
             const card = el.closest('.deal-card');
             const disp = card.dataset.disp;
-            const lat = card.dataset.lat;
-            const lng = card.dataset.lng;
+            const lat = parseFloat(card.dataset.lat);
+            const lng = parseFloat(card.dataset.lng);
             const text = el.querySelector('.item-text').textContent;
-            const key = disp + '|' + lat + '|' + lng + '|' + text;
 
-            if (cart.has(key)) {{
-                cart.delete(key);
+            // Check if already in cart
+            const idx = cartItems.findIndex(c => c.disp === disp && c.text === text);
+            if (idx >= 0) {{
+                cartItems.splice(idx, 1);
                 el.classList.remove('in-cart');
             }} else {{
-                cart.set(key, true);
+                cartItems.push({{ disp, lat, lng, text }});
                 el.classList.add('in-cart');
             }}
             updateCartUI();
         }}
 
         function updateCartUI() {{
-            const count = cart.size;
+            const count = cartItems.length;
             document.getElementById('cartCount').textContent = count;
             document.getElementById('floatingCart').classList.toggle('visible', count > 0);
+
+            // Also show unique stop count
+            const uniqueStops = new Set(cartItems.map(c => c.disp));
+            document.getElementById('cartCount').textContent = count;
         }}
 
         function openRoutePanel() {{
             // Group by dispensary and get unique stops
             const stops = {{}};
-            cart.forEach((_, key) => {{
-                const [disp, lat, lng, ...textParts] = key.split('|');
-                const text = textParts.join('|');
-                if (!stops[disp]) stops[disp] = {{ lat: parseFloat(lat), lng: parseFloat(lng), items: [] }};
-                stops[disp].items.push(text);
+            cartItems.forEach(item => {{
+                if (!stops[item.disp]) stops[item.disp] = {{ lat: item.lat, lng: item.lng, items: [] }};
+                if (!stops[item.disp].items.includes(item.text)) {{
+                    stops[item.disp].items.push(item.text);
+                }}
             }});
 
             // Sort stops by nearest-neighbor from HQ
@@ -1043,6 +1050,10 @@ def build_html(deals, generated_at):
             }}
 
             // Build route stops HTML with shopping list per stop
+            const totalItems = cartItems.length;
+            const totalStops = sorted.length;
+            document.getElementById('routeSummary').textContent = totalItems + ' item' + (totalItems !== 1 ? 's' : '') + ' at ' + totalStops + ' stop' + (totalStops !== 1 ? 's' : '');
+
             const stopsDiv = document.getElementById('routeStops');
             stopsDiv.innerHTML = sorted.map((s, i) => {{
                 const itemsList = s.items.map(item =>
@@ -1076,7 +1087,7 @@ def build_html(deals, generated_at):
         }}
 
         function clearCart() {{
-            cart.clear();
+            cartItems = [];
             document.querySelectorAll('.deal-item.in-cart').forEach(el => el.classList.remove('in-cart'));
             updateCartUI();
             closeRoutePanel();
