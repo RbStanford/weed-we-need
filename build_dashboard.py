@@ -106,32 +106,31 @@ def haversine(lat1, lon1, lat2, lon2):
     return R * 2 * math.asin(math.sqrt(a))
 
 
-def get_locations_html(chain_key, disp_name):
-    """Build HTML for nearby locations as selectable buttons."""
+def get_locations_html(chain_key):
+    """Build HTML for nearby locations with distances and Google Maps links."""
     locations = NEARBY_LOCATIONS.get(chain_key, [])
     if not locations:
-        return "", None, None
+        return ""
 
-    # Sort by distance
+    # Sort by distance from Jared
     locs_with_dist = []
     for name, addr, city, lat, lng in locations:
         dist = haversine(JARED_LAT, JARED_LNG, lat, lng)
-        locs_with_dist.append((dist, name, addr, city, lat, lng))
+        maps_url = f"https://www.google.com/maps/dir/{JARED_LAT},{JARED_LNG}/{lat},{lng}"
+        locs_with_dist.append((dist, name, addr, city, maps_url))
     locs_with_dist.sort()
 
-    buttons = []
-    for dist, name, addr, city, lat, lng in locs_with_dist:
-        buttons.append(
-            f'<button class="loc-btn" onclick="pickLocation(this)" '
-            f'data-lat="{lat}" data-lng="{lng}" data-addr="{addr}, {city}" data-disp="{disp_name}">'
+    links = []
+    for dist, name, addr, city, maps_url in locs_with_dist:
+        links.append(
+            f'<a href="{maps_url}" target="_blank" rel="noopener" class="location-link">'
             f'<span class="loc-distance">{dist:.1f} mi</span> '
             f'<span class="loc-addr">{addr}, {city}</span>'
-            f'</button>'
+            f'<span class="loc-arrow">&#8599;</span>'
+            f'</a>'
         )
 
-    label = '<p class="loc-prompt">&#128205; Pick your location first:</p>' if len(buttons) > 1 else '<p class="loc-prompt">&#128205; Your nearest location:</p>'
-
-    return f'{label}<div class="locations">{"".join(buttons)}</div>', locs_with_dist[0][4], locs_with_dist[0][5]
+    return f'<div class="locations">{"".join(links)}</div>'
 
 
 def fetch_deals():
@@ -292,9 +291,9 @@ def build_html(deals, generated_at):
         if disp["description"]:
             standing_deals = f'<p class="disp-standing">{disp["description"]}</p>'
 
-        # Get nearby locations as selectable buttons
+        # Get nearby locations with distances and directions links
         chain_key = disp_name.lower().strip()
-        locations_html, default_lat, default_lng = get_locations_html(chain_key, disp_name)
+        locations_html = get_locations_html(chain_key)
 
         dispensary_sections.append(f'''
         <section class="dispensary-section" data-dispensary="{disp_name.lower()}">
@@ -309,8 +308,7 @@ def build_html(deals, generated_at):
                 {website_link}
             </div>
             {locations_html}
-            <div class="deals-grid locked" data-disp="{disp_name}">
-                <div class="locked-msg">&#128274; Select a location above to start shopping</div>
+            <div class="deals-grid">
                 {"".join(cards_html)}
             </div>
         </section>''')
@@ -577,13 +575,6 @@ def build_html(deals, generated_at):
             margin-bottom: 4px;
         }}
 
-        .loc-prompt {{
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 6px;
-        }}
-
         .locations {{
             display: flex;
             flex-direction: column;
@@ -591,35 +582,27 @@ def build_html(deals, generated_at):
             margin-bottom: 12px;
         }}
 
-        .loc-btn {{
+        .location-link {{
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 14px;
+            padding: 8px 12px;
             background: var(--surface);
-            border: 2px solid var(--border);
-            border-radius: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-decoration: none;
             color: var(--text);
-            font-size: 14px;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-            transition: all 0.15s;
+            font-size: 13px;
         }}
 
-        .loc-btn:active {{
-            background: #f0fdf4;
-        }}
-
-        .loc-btn.selected {{
-            border-color: var(--accent);
-            background: #f0fdf4;
+        .location-link:active {{
+            background: var(--accent-dim);
         }}
 
         .loc-distance {{
             font-weight: 700;
             color: var(--accent);
-            min-width: 55px;
+            min-width: 50px;
         }}
 
         .loc-addr {{
@@ -627,21 +610,9 @@ def build_html(deals, generated_at):
             color: var(--text-muted);
         }}
 
-        .deals-grid.locked .deal-card {{
-            opacity: 0.3;
-            pointer-events: none;
-        }}
-
-        .locked-msg {{
-            text-align: center;
-            padding: 12px;
-            font-size: 14px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }}
-
-        .deals-grid:not(.locked) .locked-msg {{
-            display: none;
+        .loc-arrow {{
+            color: var(--accent);
+            font-size: 16px;
         }}
 
         .deals-grid {{
@@ -980,10 +951,10 @@ def build_html(deals, generated_at):
 <section class="how-it-works">
             <h3>&#128663; How The Weed Run Works</h3>
             <ol>
-                <li><strong>Pick a location</strong> — tap which store you're going to</li>
-                <li><strong>Tap the items you want</strong> — they turn green and go in your cart</li>
-                <li><strong>Repeat</strong> at other dispensaries — build your full shopping list</li>
-                <li>Tap the &#128663; button to see your list, then hit <strong>"Start The Weed Run"</strong> for the route</li>
+                <li>Browse the deals below — tap the green <strong>&#128722;</strong> button on any deal you want</li>
+                <li>A floating &#128663; button appears in the bottom right — that's your run</li>
+                <li>Tap it to see your picks, choose <strong>My Run</strong> or <strong>Our Run</strong></li>
+                <li>Hit <strong>"Start The Weed Run"</strong> and Google Maps opens with the fastest route to every stop</li>
             </ol>
         </section>
 
@@ -1017,33 +988,7 @@ def build_html(deals, generated_at):
     <script>
         const HQ_LAT = {JARED_LAT};
         const HQ_LNG = {JARED_LNG};
-        const cart = new Map();
-        const selectedLocations = {{}}; // disp -> {{lat, lng, addr}}
-
-        function pickLocation(btn) {{
-            const disp = btn.dataset.disp;
-            const lat = btn.dataset.lat;
-            const lng = btn.dataset.lng;
-            const addr = btn.dataset.addr;
-
-            // Deselect siblings
-            btn.closest('.locations').querySelectorAll('.loc-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-
-            // Store selected location
-            selectedLocations[disp] = {{ lat, lng, addr }};
-
-            // Unlock the deals grid for this dispensary
-            const section = btn.closest('.dispensary-section');
-            const grid = section.querySelector('.deals-grid');
-            grid.classList.remove('locked');
-
-            // Update all deal cards in this section with the selected location
-            grid.querySelectorAll('.deal-card').forEach(card => {{
-                card.dataset.lat = lat;
-                card.dataset.lng = lng;
-            }});
-        }}
+        const cart = new Map(); // key: "disp|lat|lng|itemText" -> true
 
         function toggleItem(el) {{
             const card = el.closest('.deal-card');

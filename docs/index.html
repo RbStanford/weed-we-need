@@ -253,13 +253,6 @@
             margin-bottom: 4px;
         }
 
-        .loc-prompt {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 6px;
-        }
-
         .locations {
             display: flex;
             flex-direction: column;
@@ -267,35 +260,27 @@
             margin-bottom: 12px;
         }
 
-        .loc-btn {
+        .location-link {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 14px;
+            padding: 8px 12px;
             background: var(--surface);
-            border: 2px solid var(--border);
-            border-radius: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-decoration: none;
             color: var(--text);
-            font-size: 14px;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-            transition: all 0.15s;
+            font-size: 13px;
         }
 
-        .loc-btn:active {
-            background: #f0fdf4;
-        }
-
-        .loc-btn.selected {
-            border-color: var(--accent);
-            background: #f0fdf4;
+        .location-link:active {
+            background: var(--accent-dim);
         }
 
         .loc-distance {
             font-weight: 700;
             color: var(--accent);
-            min-width: 55px;
+            min-width: 50px;
         }
 
         .loc-addr {
@@ -303,21 +288,9 @@
             color: var(--text-muted);
         }
 
-        .deals-grid.locked .deal-card {
-            opacity: 0.3;
-            pointer-events: none;
-        }
-
-        .locked-msg {
-            text-align: center;
-            padding: 12px;
-            font-size: 14px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .deals-grid:not(.locked) .locked-msg {
-            display: none;
+        .loc-arrow {
+            color: var(--accent);
+            font-size: 16px;
         }
 
         .deals-grid {
@@ -642,7 +615,7 @@
             <div>
                 <h1>&#127807; The Weed We Need</h1>
                 <p class="stats">Daily Deal Report &middot; 37 deals &middot; 12 dispensaries</p>
-                <p class="stats">Updated April 13, 2026 at 02:19 AM</p>
+                <p class="stats">Updated April 13, 2026 at 02:15 AM</p>
             </div>
             <button class="refresh-btn" onclick="location.reload()">&#8635; Refresh</button>
         </div>
@@ -656,10 +629,10 @@
 <section class="how-it-works">
             <h3>&#128663; How The Weed Run Works</h3>
             <ol>
-                <li><strong>Pick a location</strong> — tap which store you're going to</li>
-                <li><strong>Tap the items you want</strong> — they turn green and go in your cart</li>
-                <li><strong>Repeat</strong> at other dispensaries — build your full shopping list</li>
-                <li>Tap the &#128663; button to see your list, then hit <strong>"Start The Weed Run"</strong> for the route</li>
+                <li>Browse the deals below — tap the green <strong>&#128722;</strong> button on any deal you want</li>
+                <li>A floating &#128663; button appears in the bottom right — that's your run</li>
+                <li>Tap it to see your picks, choose <strong>My Run</strong> or <strong>Our Run</strong></li>
+                <li>Hit <strong>"Start The Weed Run"</strong> and Google Maps opens with the fastest route to every stop</li>
             </ol>
         </section>
 
@@ -676,8 +649,7 @@
                 <a href="https://ayrdispensaries.com/florida/discount-programs/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Click Here To Order Now</a>
             </div>
             
-            <div class="deals-grid locked" data-disp="AYR Wellness">
-                <div class="locked-msg">&#128274; Select a location above to start shopping</div>
+            <div class="deals-grid">
                 
             <div class="deal-card" data-category="concentrates" data-disp="AYR Wellness" data-lat="27.4175" data-lng="-80.3535">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_20_2056072509.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
@@ -704,9 +676,8 @@
                 </div>
                 <a href="https://cookiesflorida.co/specials/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Click Here To Order Now</a>
             </div>
-            <p class="loc-prompt">&#128205; Your nearest location:</p><div class="locations"><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.277" data-lng="-80.398" data-addr="1600 NW Courtyard Cir, Port St. Lucie" data-disp="Cookies"><span class="loc-distance">10.1 mi</span> <span class="loc-addr">1600 NW Courtyard Cir, Port St. Lucie</span></button></div>
-            <div class="deals-grid locked" data-disp="Cookies">
-                <div class="locked-msg">&#128274; Select a location above to start shopping</div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.277,-80.398" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">10.1 mi</span> <span class="loc-addr">1600 NW Courtyard Cir, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
                 
             <div class="deal-card" data-category="deals" data-disp="Cookies" data-lat="27.277" data-lng="-80.398">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_38_1052255210.webp" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
@@ -757,9 +728,8 @@
                 </div>
                 <a href="https://curaleaf.com" target="_blank" rel="noopener" class="disp-order-link">&#127807; Click Here To Order Now</a>
             </div>
-            <p class="loc-prompt">&#128205; Pick your location first:</p><div class="locations"><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.432" data-lng="-80.395" data-addr="5192 Okeechobee Rd, Fort Pierce" data-disp="Curaleaf"><span class="loc-distance">2.7 mi</span> <span class="loc-addr">5192 Okeechobee Rd, Fort Pierce</span></button><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.283" data-lng="-80.389" data-addr="1703 NW St Lucie West Blvd, Port St. Lucie" data-disp="Curaleaf"><span class="loc-distance">9.5 mi</span> <span class="loc-addr">1703 NW St Lucie West Blvd, Port St. Lucie</span></button><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.262" data-lng="-80.237" data-addr="3458 NW Federal Hwy, Jensen Beach" data-disp="Curaleaf"><span class="loc-distance">12.9 mi</span> <span class="loc-addr">3458 NW Federal Hwy, Jensen Beach</span></button><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.154" data-lng="-80.2183" data-addr="4203 SE Federal Hwy, Stuart" data-disp="Curaleaf"><span class="loc-distance">20.0 mi</span> <span class="loc-addr">4203 SE Federal Hwy, Stuart</span></button></div>
-            <div class="deals-grid locked" data-disp="Curaleaf">
-                <div class="locked-msg">&#128274; Select a location above to start shopping</div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.432,-80.395" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">2.7 mi</span> <span class="loc-addr">5192 Okeechobee Rd, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.283,-80.389" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">9.5 mi</span> <span class="loc-addr">1703 NW St Lucie West Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.262,-80.237" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">12.9 mi</span> <span class="loc-addr">3458 NW Federal Hwy, Jensen Beach</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.154,-80.2183" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">20.0 mi</span> <span class="loc-addr">4203 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
                 
             <div class="deal-card" data-category="flower" data-disp="Curaleaf" data-lat="27.432" data-lng="-80.395">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_9_1348678462.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
@@ -834,9 +804,8 @@
                 </div>
                 <a href="https://getfluent.com/promotions/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Click Here To Order Now</a>
             </div>
-            <p class="loc-prompt">&#128205; Your nearest location:</p><div class="locations"><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.422" data-lng="-80.331" data-addr="2509 S US Hwy 1, Fort Pierce" data-disp="Fluent"><span class="loc-distance">1.4 mi</span> <span class="loc-addr">2509 S US Hwy 1, Fort Pierce</span></button></div>
-            <div class="deals-grid locked" data-disp="Fluent">
-                <div class="locked-msg">&#128274; Select a location above to start shopping</div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.422,-80.331" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">1.4 mi</span> <span class="loc-addr">2509 S US Hwy 1, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
                 
             <div class="deal-card" data-category="edibles" data-disp="Fluent" data-lat="27.422" data-lng="-80.331">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_7_841265701.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
@@ -899,9 +868,8 @@
                 </div>
                 <a href="https://www.greendragonfl.com/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Click Here To Order Now</a>
             </div>
-            <p class="loc-prompt">&#128205; Pick your location first:</p><div class="locations"><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.425" data-lng="-80.33" data-addr="2217 S US Hwy 1, Fort Pierce" data-disp="Green Dragon"><span class="loc-distance">1.5 mi</span> <span class="loc-addr">2217 S US Hwy 1, Fort Pierce</span></button><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.175" data-lng="-80.227" data-addr="2285 SE Federal Hwy, Stuart" data-disp="Green Dragon"><span class="loc-distance">18.5 mi</span> <span class="loc-addr">2285 SE Federal Hwy, Stuart</span></button></div>
-            <div class="deals-grid locked" data-disp="Green Dragon">
-                <div class="locked-msg">&#128274; Select a location above to start shopping</div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.425,-80.33" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">1.5 mi</span> <span class="loc-addr">2217 S US Hwy 1, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.175,-80.227" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">18.5 mi</span> <span class="loc-addr">2285 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
                 
             <div class="deal-card" data-category="pre-rolls" data-disp="Green Dragon" data-lat="27.425" data-lng="-80.33">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_8_1609816400.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
@@ -940,9 +908,8 @@
                 </div>
                 <a href="https://growhealthy.com/discounts/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Click Here To Order Now</a>
             </div>
-            <p class="loc-prompt">&#128205; Your nearest location:</p><div class="locations"><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.154" data-lng="-80.214" data-addr="3462 SE Federal Hwy, Stuart" data-disp="Grow Healthy"><span class="loc-distance">20.1 mi</span> <span class="loc-addr">3462 SE Federal Hwy, Stuart</span></button></div>
-            <div class="deals-grid locked" data-disp="Grow Healthy">
-                <div class="locked-msg">&#128274; Select a location above to start shopping</div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.154,-80.214" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">20.1 mi</span> <span class="loc-addr">3462 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
                 
             <div class="deal-card" data-category="flower" data-disp="Grow Healthy" data-lat="27.154" data-lng="-80.214">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_6_1263392426.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
@@ -1005,9 +972,8 @@
                 </div>
                 <a href="https://www.muvfl.com" target="_blank" rel="noopener" class="disp-order-link">&#127807; Click Here To Order Now</a>
             </div>
-            <p class="loc-prompt">&#128205; Pick your location first:</p><div class="locations"><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.436" data-lng="-80.3255" data-addr="1006 S US Hwy 1, Fort Pierce" data-disp="Müv"><span class="loc-distance">2.1 mi</span> <span class="loc-addr">1006 S US Hwy 1, Fort Pierce</span></button><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.2633" data-lng="-80.3944" data-addr="1564 NW Gatlin Blvd, Port St. Lucie" data-disp="Müv"><span class="loc-distance">10.9 mi</span> <span class="loc-addr">1564 NW Gatlin Blvd, Port St. Lucie</span></button><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.213" data-lng="-80.277" data-addr="3550 NW Federal Hwy, Stuart" data-disp="Müv"><span class="loc-distance">14.9 mi</span> <span class="loc-addr">3550 NW Federal Hwy, Stuart</span></button></div>
-            <div class="deals-grid locked" data-disp="Müv">
-                <div class="locked-msg">&#128274; Select a location above to start shopping</div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.436,-80.3255" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">2.1 mi</span> <span class="loc-addr">1006 S US Hwy 1, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.2633,-80.3944" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">10.9 mi</span> <span class="loc-addr">1564 NW Gatlin Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.213,-80.277" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">14.9 mi</span> <span class="loc-addr">3550 NW Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
                 
             <div class="deal-card" data-category="flower" data-disp="Müv" data-lat="27.436" data-lng="-80.3255">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_18_1453378199.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
@@ -1046,9 +1012,8 @@
                 </div>
                 <a href="https://planet13.com/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Click Here To Order Now</a>
             </div>
-            <p class="loc-prompt">&#128205; Your nearest location:</p><div class="locations"><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.215" data-lng="-80.274" data-addr="3501 NW Federal Hwy, Stuart" data-disp="Planet 13"><span class="loc-distance">14.8 mi</span> <span class="loc-addr">3501 NW Federal Hwy, Stuart</span></button></div>
-            <div class="deals-grid locked" data-disp="Planet 13">
-                <div class="locked-msg">&#128274; Select a location above to start shopping</div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.215,-80.274" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">14.8 mi</span> <span class="loc-addr">3501 NW Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
                 
             <div class="deal-card" data-category="flower" data-disp="Planet 13" data-lat="27.215" data-lng="-80.274">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_12_1431213695.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
@@ -1099,9 +1064,8 @@
                 </div>
                 <a href="https://www.sanctuarymed.com/#about-us/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Click Here To Order Now</a>
             </div>
-            <p class="loc-prompt">&#128205; Your nearest location:</p><div class="locations"><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.433" data-lng="-80.413" data-addr="5774 Okeechobee Rd, Fort Pierce" data-disp="Sanctuary"><span class="loc-distance">3.8 mi</span> <span class="loc-addr">5774 Okeechobee Rd, Fort Pierce</span></button></div>
-            <div class="deals-grid locked" data-disp="Sanctuary">
-                <div class="locked-msg">&#128274; Select a location above to start shopping</div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.433,-80.413" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">3.8 mi</span> <span class="loc-addr">5774 Okeechobee Rd, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
                 
             <div class="deal-card" data-category="accessories" data-disp="Sanctuary" data-lat="27.433" data-lng="-80.413">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_8_1316697091.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
@@ -1140,9 +1104,8 @@
                 </div>
                 <a href="https://www.sunnyside.shop/page/promos-and-deals-sunnyside-florida/" target="_blank" rel="noopener" class="disp-order-link">&#127807; Click Here To Order Now</a>
             </div>
-            <p class="loc-prompt">&#128205; Your nearest location:</p><div class="locations"><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.264" data-lng="-80.3974" data-addr="1576 NW Gatlin Blvd, Port St. Lucie" data-disp="Sunnyside"><span class="loc-distance">10.9 mi</span> <span class="loc-addr">1576 NW Gatlin Blvd, Port St. Lucie</span></button></div>
-            <div class="deals-grid locked" data-disp="Sunnyside">
-                <div class="locked-msg">&#128274; Select a location above to start shopping</div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.264,-80.3974" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">10.9 mi</span> <span class="loc-addr">1576 NW Gatlin Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
                 
             <div class="deal-card" data-category="flower" data-disp="Sunnyside" data-lat="27.264" data-lng="-80.3974">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_6_2065473544.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
@@ -1181,9 +1144,8 @@
                 </div>
                 <a href="https://surterra.com" target="_blank" rel="noopener" class="disp-order-link">&#127807; Click Here To Order Now</a>
             </div>
-            <p class="loc-prompt">&#128205; Your nearest location:</p><div class="locations"><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.264" data-lng="-80.329" data-addr="1752 SW Gatlin Blvd, Port St. Lucie" data-disp="Surterra"><span class="loc-distance">10.7 mi</span> <span class="loc-addr">1752 SW Gatlin Blvd, Port St. Lucie</span></button></div>
-            <div class="deals-grid locked" data-disp="Surterra">
-                <div class="locked-msg">&#128274; Select a location above to start shopping</div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.264,-80.329" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">10.7 mi</span> <span class="loc-addr">1752 SW Gatlin Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
                 
             <div class="deal-card" data-category="deals" data-disp="Surterra" data-lat="27.264" data-lng="-80.329">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_3_1132945569.webp" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
@@ -1246,9 +1208,8 @@
                 </div>
                 <a href="https://www.trulieve.com" target="_blank" rel="noopener" class="disp-order-link">&#127807; Click Here To Order Now</a>
             </div>
-            <p class="loc-prompt">&#128205; Pick your location first:</p><div class="locations"><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.426" data-lng="-80.33" data-addr="2200 S US Hwy 1, Fort Pierce" data-disp="Trulieve"><span class="loc-distance">1.6 mi</span> <span class="loc-addr">2200 S US Hwy 1, Fort Pierce</span></button><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.278" data-lng="-80.324" data-addr="1707 SE Port St Lucie Blvd, Port St. Lucie" data-disp="Trulieve"><span class="loc-distance">9.8 mi</span> <span class="loc-addr">1707 SE Port St Lucie Blvd, Port St. Lucie</span></button><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.2631" data-lng="-80.3395" data-addr="1858 SW Gatlin Blvd, Port St. Lucie" data-disp="Trulieve"><span class="loc-distance">10.7 mi</span> <span class="loc-addr">1858 SW Gatlin Blvd, Port St. Lucie</span></button><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.185" data-lng="-80.24" data-addr="2100 SE Federal Hwy, Stuart" data-disp="Trulieve"><span class="loc-distance">17.5 mi</span> <span class="loc-addr">2100 SE Federal Hwy, Stuart</span></button><button class="loc-btn" onclick="pickLocation(this)" data-lat="27.171" data-lng="-80.227" data-addr="2443 SE Federal Hwy, Stuart" data-disp="Trulieve"><span class="loc-distance">18.7 mi</span> <span class="loc-addr">2443 SE Federal Hwy, Stuart</span></button></div>
-            <div class="deals-grid locked" data-disp="Trulieve">
-                <div class="locked-msg">&#128274; Select a location above to start shopping</div>
+            <div class="locations"><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.426,-80.33" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">1.6 mi</span> <span class="loc-addr">2200 S US Hwy 1, Fort Pierce</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.278,-80.324" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">9.8 mi</span> <span class="loc-addr">1707 SE Port St Lucie Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.2631,-80.3395" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">10.7 mi</span> <span class="loc-addr">1858 SW Gatlin Blvd, Port St. Lucie</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.185,-80.24" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">17.5 mi</span> <span class="loc-addr">2100 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a><a href="https://www.google.com/maps/dir/27.4175,-80.3535/27.171,-80.227" target="_blank" rel="noopener" class="location-link"><span class="loc-distance">18.7 mi</span> <span class="loc-addr">2443 SE Federal Hwy, Stuart</span><span class="loc-arrow">&#8599;</span></a></div>
+            <div class="deals-grid">
                 
             <div class="deal-card" data-category="flower" data-disp="Trulieve" data-lat="27.426" data-lng="-80.33">
                 <img src="https://cannadealsfl.com/api/images/deal-images/image_6_1779001945.jpg" alt="" class="deal-img" loading="lazy" onerror="this.style.display='none'">
@@ -1341,33 +1302,7 @@
     <script>
         const HQ_LAT = 27.4175;
         const HQ_LNG = -80.3535;
-        const cart = new Map();
-        const selectedLocations = {}; // disp -> {lat, lng, addr}
-
-        function pickLocation(btn) {
-            const disp = btn.dataset.disp;
-            const lat = btn.dataset.lat;
-            const lng = btn.dataset.lng;
-            const addr = btn.dataset.addr;
-
-            // Deselect siblings
-            btn.closest('.locations').querySelectorAll('.loc-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-
-            // Store selected location
-            selectedLocations[disp] = { lat, lng, addr };
-
-            // Unlock the deals grid for this dispensary
-            const section = btn.closest('.dispensary-section');
-            const grid = section.querySelector('.deals-grid');
-            grid.classList.remove('locked');
-
-            // Update all deal cards in this section with the selected location
-            grid.querySelectorAll('.deal-card').forEach(card => {
-                card.dataset.lat = lat;
-                card.dataset.lng = lng;
-            });
-        }
+        const cart = new Map(); // key: "disp|lat|lng|itemText" -> true
 
         function toggleItem(el) {
             const card = el.closest('.deal-card');
