@@ -275,7 +275,7 @@ def build_html(deals, generated_at):
 
         website_link = ""
         if disp["website"]:
-            website_link = f'<a href="{disp["website"]}" target="_blank" rel="noopener" class="disp-order-link">&#127807; Schroer The Grower &mdash; Click Here To Order Now</a>'
+            website_link = f'<a href="{disp["website"]}" target="_blank" rel="noopener" class="disp-order-link">&#127807; Click Here To Order Now</a>'
 
         standing_deals = ""
         if disp["description"]:
@@ -598,8 +598,6 @@ def build_html(deals, generated_at):
 
         .deal-img {{
             width: 100%;
-            max-height: 180px;
-            object-fit: cover;
             display: block;
         }}
 
@@ -859,7 +857,7 @@ def build_html(deals, generated_at):
         <div class="header-top">
             <div>
                 <h1>&#127807; The Weed We Need</h1>
-                <p class="stats">Jared &amp; Nicole's Daily Deal Report &middot; {deal_count} deals &middot; {dispensary_count} dispensaries</p>
+                <p class="stats">Daily Deal Report &middot; {deal_count} deals &middot; {dispensary_count} dispensaries</p>
                 <p class="stats">Updated {timestamp}</p>
             </div>
             <button class="refresh-btn" onclick="location.reload()">&#8635; Refresh</button>
@@ -897,10 +895,10 @@ def build_html(deals, generated_at):
         <button class="route-close" onclick="closeRoutePanel()">&times;</button>
         <h3>&#127807; The Weed Run</h3>
         <div class="runner-picker">
-            <button class="runner-btn active" id="runnerJared" onclick="pickRunner('Jared')">&#128587;&#8205;&#9794;&#65039; Jared's Run</button>
-            <button class="runner-btn" id="runnerNicole" onclick="pickRunner('Nicole')">&#128587;&#8205;&#9792;&#65039; Nicole's Run</button>
+            <button class="runner-btn active" id="runnerMe" onclick="pickRunner('I am')">&#128587; My Run</button>
+            <button class="runner-btn" id="runnerOther" onclick="pickRunner('We are')">&#128107; Our Run</button>
         </div>
-        <p id="runnerLabel" style="font-size:13px; color:#666; margin-bottom:12px;">Jared is making The Weed Run today</p>
+        <p id="runnerLabel" style="font-size:13px; color:#666; margin-bottom:12px;">I am making The Weed Run today</p>
         <div id="routeStops"></div>
         <a id="routeLink" class="route-btn" target="_blank" rel="noopener">&#128663; Start The Weed Run in Google Maps</a>
         <button class="route-btn" style="background:#ef4444; margin-top:8px;" onclick="clearCart()">Clear All</button>
@@ -983,13 +981,13 @@ def build_html(deals, generated_at):
             document.getElementById('routeOverlay').classList.remove('open');
         }}
 
-        let currentRunner = 'Jared';
+        let currentRunner = 'I am';
 
-        function pickRunner(name) {{
-            currentRunner = name;
-            document.getElementById('runnerJared').classList.toggle('active', name === 'Jared');
-            document.getElementById('runnerNicole').classList.toggle('active', name === 'Nicole');
-            document.getElementById('runnerLabel').textContent = name + ' is making The Weed Run today';
+        function pickRunner(who) {{
+            currentRunner = who;
+            document.getElementById('runnerMe').classList.toggle('active', who === 'I am');
+            document.getElementById('runnerOther').classList.toggle('active', who === 'We are');
+            document.getElementById('runnerLabel').textContent = who + ' making The Weed Run today';
         }}
 
         function clearCart() {{
