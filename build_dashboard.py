@@ -870,11 +870,7 @@ def build_html(deals, generated_at):
     <main class="main" id="deals-container">
         <section class="hq-section">
             <h2 class="hq-title">&#128205; YOU ARE HERE</h2>
-            <p class="hq-subtitle">All distances measured from HQ</p>
-            <div class="hq-photo">
-                <img src="jared-hq.png" alt="Jared and Nicole's HQ">
-                <div class="hq-badge">&#127807; HQ &middot; 4665 S 25th St</div>
-            </div>
+            <p class="hq-subtitle">All distances measured from 4665 S 25th St, Fort Pierce</p>
         </section>
 
         {"".join(dispensary_sections)}
