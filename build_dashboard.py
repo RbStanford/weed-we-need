@@ -892,12 +892,8 @@ def build_html(deals, generated_at):
     </header>
 
     <main class="main" id="deals-container">
-        <section class="hq-section">
-            <h2 class="hq-title">&#128205; YOU ARE HERE</h2>
-            <p class="hq-subtitle">All distances measured from 4665 S 25th St, Fort Pierce</p>
-        </section>
 
-        <section class="how-it-works">
+<section class="how-it-works">
             <h3>&#128663; How The Weed Run Works</h3>
             <ol>
                 <li>Browse the deals below — tap the green <strong>&#128722;</strong> button on any deal you want</li>
