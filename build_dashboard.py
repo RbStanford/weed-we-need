@@ -1,7 +1,7 @@
 """
-The Weed We Need — Jared & Nicole's Daily Deal Report
-Pulls deals from CannaDealsFL API, generates a mobile-friendly HTML page,
-and deploys to Vercel.
+The Weed We Need — Daily FL Dispensary Deal Report
+Pulls deals from CannaDealsFL API, generates a mobile-friendly HTML page
+with GPS-based location filtering. Works for anyone in Florida.
 
 Usage:
     python build_dashboard.py          # Generate HTML only
@@ -17,121 +17,7 @@ from pathlib import Path
 API_URL = "https://cannadealsfl.com/api/deals?limit=100&page=1"
 OUTPUT_DIR = Path(__file__).parent / "docs"
 OUTPUT_FILE = OUTPUT_DIR / "index.html"
-
-# Jared's home: 4665 S 25th St, Fort Pierce, FL
-JARED_LAT = 27.4175
-JARED_LNG = -80.3535
-
-# Dispensary chains with locations within 20 miles of Jared
-# Source: Weedmaps discovery API, verified 2026-04-10
-LOCAL_CHAINS = {
-    "ayr", "cannabist", "cookies", "curaleaf", "fluent",
-    "green dragon", "grow healthy", "growhealthy",
-    "müv", "muv", "planet 13", "sanctuary",
-    "sunnyside", "surterra", "trulieve",
-}
-
-# Nearby locations per chain — name, address, city, lat, lng
-# Used for distance calc and Google Maps links
-NEARBY_LOCATIONS = {
-    "fluent": [
-        ("FLUENT", "2509 S US Hwy 1", "Fort Pierce", 27.4220, -80.3310),
-    ],
-    "green dragon": [
-        ("Green Dragon", "2217 S US Hwy 1", "Fort Pierce", 27.4250, -80.3300),
-        ("Green Dragon", "2285 SE Federal Hwy", "Stuart", 27.1750, -80.2270),
-    ],
-    "trulieve": [
-        ("Trulieve", "2200 S US Hwy 1", "Fort Pierce", 27.4260, -80.3300),
-        ("Trulieve", "1858 SW Gatlin Blvd", "Port St. Lucie", 27.2631, -80.3395),
-        ("Trulieve", "1707 SE Port St Lucie Blvd", "Port St. Lucie", 27.2780, -80.3240),
-        ("Trulieve", "2100 SE Federal Hwy", "Stuart", 27.1850, -80.2400),
-        ("Trulieve", "2443 SE Federal Hwy", "Stuart", 27.1710, -80.2270),
-    ],
-    "ayr": [
-        ("AYR Cannabis", "4580 Okeechobee Rd", "Fort Pierce", 27.4310, -80.3800),
-        ("AYR Cannabis", "1428 SE Village Green Dr", "Port St. Lucie", 27.2730, -80.3190),
-        ("AYR Cannabis", "2419 SE Federal Hwy", "Stuart", 27.1720, -80.2260),
-    ],
-    "müv": [
-        ("MUV", "1006 S US Hwy 1", "Fort Pierce", 27.4360, -80.3255),
-        ("MUV", "1564 NW Gatlin Blvd", "Port St. Lucie", 27.2633, -80.3944),
-        ("MUV", "3550 NW Federal Hwy", "Stuart", 27.2130, -80.2770),
-    ],
-    "muv": [
-        ("MUV", "1006 S US Hwy 1", "Fort Pierce", 27.4360, -80.3255),
-        ("MUV", "1564 NW Gatlin Blvd", "Port St. Lucie", 27.2633, -80.3944),
-        ("MUV", "3550 NW Federal Hwy", "Stuart", 27.2130, -80.2770),
-    ],
-    "curaleaf": [
-        ("Curaleaf", "5192 Okeechobee Rd", "Fort Pierce", 27.4320, -80.3950),
-        ("Curaleaf", "1703 NW St Lucie West Blvd", "Port St. Lucie", 27.2830, -80.3890),
-        ("Curaleaf", "3458 NW Federal Hwy", "Jensen Beach", 27.2620, -80.2370),
-        ("Curaleaf", "4203 SE Federal Hwy", "Stuart", 27.1540, -80.2183),
-    ],
-    "sanctuary": [
-        ("Sanctuary Cannabis", "5774 Okeechobee Rd", "Fort Pierce", 27.4330, -80.4130),
-    ],
-    "cookies": [
-        ("Cookies", "1600 NW Courtyard Cir", "Port St. Lucie", 27.2770, -80.3980),
-    ],
-    "sunnyside": [
-        ("Sunnyside", "1576 NW Gatlin Blvd", "Port St. Lucie", 27.2640, -80.3974),
-    ],
-    "surterra": [
-        ("Surterra", "1752 SW Gatlin Blvd", "Port St. Lucie", 27.2640, -80.3290),
-    ],
-    "planet 13": [
-        ("Planet 13", "3501 NW Federal Hwy", "Stuart", 27.2150, -80.2740),
-    ],
-    "growhealthy": [
-        ("GrowHealthy", "3462 SE Federal Hwy", "Stuart", 27.1540, -80.2140),
-    ],
-    "grow healthy": [
-        ("GrowHealthy", "3462 SE Federal Hwy", "Stuart", 27.1540, -80.2140),
-    ],
-    "cannabist": [
-        ("Cannabist", "4203 SE Federal Hwy #103", "Stuart", 27.1540, -80.2183),
-    ],
-}
-
-
-def haversine(lat1, lon1, lat2, lon2):
-    """Calculate distance in miles between two lat/lng points."""
-    import math
-    R = 3959
-    dlat = math.radians(lat2 - lat1)
-    dlon = math.radians(lon2 - lon1)
-    a = math.sin(dlat/2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon/2)**2
-    return R * 2 * math.asin(math.sqrt(a))
-
-
-def get_locations_html(chain_key):
-    """Build HTML for nearby locations with distances and Google Maps links."""
-    locations = NEARBY_LOCATIONS.get(chain_key, [])
-    if not locations:
-        return ""
-
-    # Sort by distance from Jared
-    locs_with_dist = []
-    for name, addr, city, lat, lng in locations:
-        dist = haversine(JARED_LAT, JARED_LNG, lat, lng)
-        maps_url = f"https://www.google.com/maps/dir/{JARED_LAT},{JARED_LNG}/{lat},{lng}"
-        locs_with_dist.append((dist, name, addr, city, maps_url))
-    locs_with_dist.sort()
-
-    links = []
-    for dist, name, addr, city, maps_url in locs_with_dist:
-        links.append(
-            f'<a href="{maps_url}" target="_blank" rel="noopener" class="location-link">'
-            f'<span class="loc-distance">{dist:.1f} mi</span> '
-            f'<span class="loc-addr">{addr}, {city}</span>'
-            f'<span class="loc-arrow">&#8599;</span>'
-            f'</a>'
-        )
-
-    return f'<div class="locations">{"".join(links)}</div>'
-
+FL_DISPENSARIES_FILE = Path(__file__).parent / "fl_dispensaries.json"
 
 def fetch_deals():
     """Pull all active deals from CannaDealsFL API."""
@@ -151,20 +37,13 @@ def fetch_deals():
 
 
 def parse_deals(raw_deals):
-    """Normalize raw API data into clean deal objects."""
+    """Normalize raw API data into clean deal objects. No location filtering — that's done client-side."""
     parsed = []
-    skipped = []
     for d in raw_deals:
         if not d.get("is_active"):
             continue
 
         dispensary = d.get("dispensary") or {}
-
-        # Filter to only dispensaries with locations near 34982
-        disp_name = (dispensary.get("name") or "").lower().strip()
-        if not any(chain in disp_name for chain in LOCAL_CHAINS):
-            skipped.append(dispensary.get("name", "Unknown"))
-            continue
         category = d.get("product_category") or {}
 
         # Fix encoding issues (API returns mojibake for bullet chars)
@@ -192,15 +71,12 @@ def parse_deals(raw_deals):
             "is_verified": d.get("is_verified", False),
         })
 
-    if skipped:
-        print(f"Filtered out {len(skipped)} deals from dispensaries not near 34982: {', '.join(sorted(set(skipped)))}")
-
     # Sort by dispensary name then category
     parsed.sort(key=lambda x: (x["dispensary_name"].lower(), x["category_name"].lower()))
     return parsed
 
 
-def build_html(deals, generated_at):
+def build_html(deals, generated_at, fl_dispensaries_json):
     """Generate self-contained mobile-friendly HTML dashboard."""
 
     # Group deals by dispensary
@@ -261,16 +137,8 @@ def build_html(deals, generated_at):
                         )
                 items_html = f'<div class="deal-items">{"".join(item_divs)}</div>'
 
-            # Find closest location for this dispensary chain
-            closest_lat, closest_lng = JARED_LAT, JARED_LNG
-            chain_key_deal = deal["dispensary_name"].lower().strip()
-            locs = NEARBY_LOCATIONS.get(chain_key_deal, [])
-            if locs:
-                best = min(locs, key=lambda l: haversine(JARED_LAT, JARED_LNG, l[3], l[4]))
-                closest_lat, closest_lng = best[3], best[4]
-
             cards_html.append(f'''
-            <div class="deal-card" data-category="{deal['category_name'].lower()}" data-disp="{deal['dispensary_name']}" data-lat="{closest_lat}" data-lng="{closest_lng}">
+            <div class="deal-card" data-category="{deal['category_name'].lower()}" data-disp="{deal['dispensary_name']}">
                 {img_html}
                 <div class="deal-content">
                     <div class="deal-header">
@@ -291,10 +159,6 @@ def build_html(deals, generated_at):
         if disp["description"]:
             standing_deals = f'<p class="disp-standing">{disp["description"]}</p>'
 
-        # Get nearby locations with distances and directions links
-        chain_key = disp_name.lower().strip()
-        locations_html = get_locations_html(chain_key)
-
         dispensary_sections.append(f'''
         <section class="dispensary-section" data-dispensary="{disp_name.lower()}">
             <div class="disp-header">
@@ -307,7 +171,7 @@ def build_html(deals, generated_at):
                 </div>
                 {website_link}
             </div>
-            {locations_html}
+            <div class="nearby-locations" data-chain="{disp_name.lower()}"></div>
             <div class="deals-grid">
                 {"".join(cards_html)}
             </div>
@@ -936,8 +800,9 @@ def build_html(deals, generated_at):
         <div class="header-top">
             <div>
                 <h1>&#127807; The Weed We Need</h1>
-                <p class="stats">Daily Deal Report &middot; {deal_count} deals &middot; {dispensary_count} dispensaries</p>
+                <p class="stats">Daily FL Dispensary Deal Report &middot; {deal_count} deals</p>
                 <p class="stats">Updated {timestamp}</p>
+                <p class="stats" id="locationStatus" style="font-weight:600; color:var(--accent);">&#128205; Allow location access to see deals near you</p>
             </div>
             <button class="refresh-btn" onclick="location.reload()">&#8635; Refresh</button>
         </div>
@@ -987,27 +852,62 @@ def build_html(deals, generated_at):
     </div>
 
     <script>
-        const HQ_LAT = {JARED_LAT};
-        const HQ_LNG = {JARED_LNG};
-        // Cart stores objects instead of string keys to avoid delimiter bugs
+        const FL_DISPS = {fl_dispensaries_json};
+        let userLat = null, userLng = null;
         let cartItems = [];
+
+        function haversine(lat1, lon1, lat2, lon2) {{
+            const R = 3959;
+            const dLat = (lat2-lat1)*Math.PI/180, dLon = (lon2-lon1)*Math.PI/180;
+            const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }}
+
+        function initLocation() {{
+            const el = document.getElementById('locationStatus');
+            if (!navigator.geolocation) {{ el.textContent = 'Geolocation not supported. Showing all FL deals.'; return; }}
+            el.innerHTML = '&#9203; Finding your location...';
+            navigator.geolocation.getCurrentPosition(pos => {{
+                userLat = pos.coords.latitude;
+                userLng = pos.coords.longitude;
+                el.innerHTML = '&#128205; Showing deals within 20 miles of you';
+                filterByLocation();
+            }}, () => {{
+                el.textContent = 'Location access denied. Showing all FL deals.';
+            }}, {{ enableHighAccuracy: false, timeout: 10000 }});
+        }}
+
+        function filterByLocation() {{
+            document.querySelectorAll('.dispensary-section').forEach(section => {{
+                const chain = section.dataset.dispensary;
+                const nearby = FL_DISPS.filter(d => d.name.toLowerCase().includes(chain) && haversine(userLat, userLng, d.lat, d.lng) <= 20)
+                    .sort((a,b) => haversine(userLat, userLng, a.lat, a.lng) - haversine(userLat, userLng, b.lat, b.lng));
+                if (nearby.length === 0) {{ section.style.display = 'none'; return; }}
+                section.style.display = '';
+                section.querySelectorAll('.deal-card').forEach(c => {{ c.dataset.lat = nearby[0].lat; c.dataset.lng = nearby[0].lng; }});
+                const locsDiv = section.querySelector('.nearby-locations');
+                if (locsDiv) {{
+                    locsDiv.innerHTML = nearby.slice(0,5).map(loc => {{
+                        const dist = haversine(userLat, userLng, loc.lat, loc.lng).toFixed(1);
+                        const url = 'https://www.google.com/maps/dir/' + userLat + ',' + userLng + '/' + loc.lat + ',' + loc.lng;
+                        return '<a href="'+url+'" target="_blank" rel="noopener" class="location-link">' +
+                            '<span class="loc-distance">'+dist+' mi</span> ' +
+                            '<span class="loc-addr">'+loc.address+', '+loc.city+'</span>' +
+                            '<span class="loc-arrow">&#8599;</span></a>';
+                    }}).join('');
+                }}
+            }});
+        }}
 
         function toggleItem(el) {{
             const card = el.closest('.deal-card');
             const disp = card.dataset.disp;
-            const lat = parseFloat(card.dataset.lat);
-            const lng = parseFloat(card.dataset.lng);
+            const lat = parseFloat(card.dataset.lat || 0);
+            const lng = parseFloat(card.dataset.lng || 0);
             const text = el.querySelector('.item-text').textContent;
-
-            // Check if already in cart
             const idx = cartItems.findIndex(c => c.disp === disp && c.text === text);
-            if (idx >= 0) {{
-                cartItems.splice(idx, 1);
-                el.classList.remove('in-cart');
-            }} else {{
-                cartItems.push({{ disp, lat, lng, text }});
-                el.classList.add('in-cart');
-            }}
+            if (idx >= 0) {{ cartItems.splice(idx, 1); el.classList.remove('in-cart'); }}
+            else {{ cartItems.push({{ disp, lat, lng, text }}); el.classList.add('in-cart'); }}
             updateCartUI();
         }}
 
@@ -1015,58 +915,39 @@ def build_html(deals, generated_at):
             const count = cartItems.length;
             document.getElementById('cartCount').textContent = count;
             document.getElementById('floatingCart').classList.toggle('visible', count > 0);
-
-            // Also show unique stop count
-            const uniqueStops = new Set(cartItems.map(c => c.disp));
-            document.getElementById('cartCount').textContent = count;
         }}
 
         function openRoutePanel() {{
-            // Group by dispensary and get unique stops
             const stops = {{}};
             cartItems.forEach(item => {{
                 if (!stops[item.disp]) stops[item.disp] = {{ lat: item.lat, lng: item.lng, items: [] }};
-                if (!stops[item.disp].items.includes(item.text)) {{
-                    stops[item.disp].items.push(item.text);
-                }}
+                if (!stops[item.disp].items.includes(item.text)) stops[item.disp].items.push(item.text);
             }});
-
-            // Sort stops by nearest-neighbor from HQ
             const sorted = [];
             const remaining = Object.entries(stops);
-            let curLat = HQ_LAT, curLng = HQ_LNG;
-
+            let curLat = userLat || 27.4175, curLng = userLng || -80.3535;
             while (remaining.length > 0) {{
                 let bestIdx = 0, bestDist = Infinity;
                 for (let i = 0; i < remaining.length; i++) {{
                     const s = remaining[i][1];
-                    const d = Math.sqrt(Math.pow(s.lat - curLat, 2) + Math.pow(s.lng - curLng, 2));
+                    const d = Math.sqrt((s.lat-curLat)**2 + (s.lng-curLng)**2);
                     if (d < bestDist) {{ bestDist = d; bestIdx = i; }}
                 }}
                 const [name, data] = remaining.splice(bestIdx, 1)[0];
                 sorted.push({{ name, ...data }});
-                curLat = data.lat;
-                curLng = data.lng;
+                curLat = data.lat; curLng = data.lng;
             }}
-
-            // Build route stops HTML with shopping list per stop
-            const totalItems = cartItems.length;
-            const totalStops = sorted.length;
-            document.getElementById('routeSummary').textContent = totalItems + ' item' + (totalItems !== 1 ? 's' : '') + ' at ' + totalStops + ' stop' + (totalStops !== 1 ? 's' : '');
-
+            const totalItems = cartItems.length, totalStops = sorted.length;
+            document.getElementById('routeSummary').textContent = totalItems + ' item' + (totalItems!==1?'s':'') + ' at ' + totalStops + ' stop' + (totalStops!==1?'s':'');
             const stopsDiv = document.getElementById('routeStops');
-            stopsDiv.innerHTML = sorted.map((s, i) => {{
-                const itemsList = s.items.map(item =>
-                    '<li style="font-size:13px; color:#444; padding:2px 0;">' + item + '</li>'
-                ).join('');
-                return '<div class="route-stop"><span class="stop-num">' + (i+1) + '</span><strong>' + s.name + '</strong>' +
-                    '<ul style="margin:6px 0 0 32px; padding-left:16px; list-style:disc;">' + itemsList + '</ul></div>';
+            stopsDiv.innerHTML = sorted.map((s,i) => {{
+                const items = s.items.map(t => '<li style="font-size:13px;color:#444;padding:2px 0;">'+t+'</li>').join('');
+                return '<div class="route-stop"><span class="stop-num">'+(i+1)+'</span><strong>'+s.name+'</strong>' +
+                    '<ul style="margin:6px 0 0 32px;padding-left:16px;list-style:disc;">'+items+'</ul></div>';
             }}).join('');
-
-            // Build Google Maps directions URL
-            const waypoints = sorted.map(s => s.lat + ',' + s.lng);
-            const mapsUrl = 'https://www.google.com/maps/dir/' + HQ_LAT + ',' + HQ_LNG + '/' + waypoints.join('/');
-            document.getElementById('routeLink').href = mapsUrl;
+            const startLat = userLat || 27.4175, startLng = userLng || -80.3535;
+            const waypoints = sorted.map(s => s.lat+','+s.lng);
+            document.getElementById('routeLink').href = 'https://www.google.com/maps/dir/'+startLat+','+startLng+'/'+waypoints.join('/');
 
             document.getElementById('routePanel').classList.add('open');
             document.getElementById('routeOverlay').classList.add('open');
@@ -1115,6 +996,8 @@ def build_html(deals, generated_at):
                 }});
             }});
         }});
+        // Init location on page load
+        initLocation();
     </script>
 </body>
 </html>'''
@@ -1135,9 +1018,18 @@ def main():
     if not deals:
         print("WARNING: No active deals found!")
 
+    print("Loading FL dispensary locations...")
+    with open(FL_DISPENSARIES_FILE, encoding="utf-8") as f:
+        fl_disps = json.load(f)
+    print(f"Loaded {len(fl_disps)} FL dispensary locations")
+
+    # Minify: only keep fields we need
+    fl_disps_slim = [{"name": d["name"], "address": d["address"], "city": d["city"], "lat": d["lat"], "lng": d["lng"]} for d in fl_disps]
+    fl_json = json.dumps(fl_disps_slim)
+
     print("Building HTML...")
     now = datetime.now(timezone.utc)
-    html = build_html(deals, now)
+    html = build_html(deals, now, fl_json)
 
     OUTPUT_DIR.mkdir(exist_ok=True)
     OUTPUT_FILE.write_text(html, encoding="utf-8")
