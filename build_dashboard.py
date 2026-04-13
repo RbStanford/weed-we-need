@@ -245,10 +245,21 @@ def build_html(deals, generated_at):
                     img_src = f"https://cannadealsfl.com{img_src}"
                 img_html = f'<img src="{img_src}" alt="" class="deal-img" loading="lazy" onerror="this.style.display=\'none\'">'
 
-            desc_html = ""
+            # Build tappable line items from description
+            items_html = ""
             if deal["description"]:
-                desc_lines = deal["description"].replace("\n", "<br>")
-                desc_html = f'<p class="deal-desc">{desc_lines}</p>'
+                lines = [l.strip() for l in deal["description"].split("\n") if l.strip()]
+                item_divs = []
+                for line in lines:
+                    clean = line.lstrip("•-* ").strip()
+                    if clean:
+                        item_divs.append(
+                            f'<div class="deal-item" onclick="toggleItem(this)">'
+                            f'<span class="item-check">&#128722;</span>'
+                            f'<span class="item-text">{clean}</span>'
+                            f'</div>'
+                        )
+                items_html = f'<div class="deal-items">{"".join(item_divs)}</div>'
 
             # Find closest location for this dispensary chain
             closest_lat, closest_lng = JARED_LAT, JARED_LNG
@@ -266,10 +277,9 @@ def build_html(deals, generated_at):
                         <span class="category-tag" style="background:{deal['category_color']}20; color:{deal['category_color']}">{deal['category_name']}</span>
                         {badge}
                         {verified}
-                        <button class="cart-btn" onclick="toggleCart(this)" title="Add to route">&#128722;</button>
                     </div>
                     <h3 class="deal-title">{deal['title']}</h3>
-                    {desc_html}
+                    {items_html}
                 </div>
             </div>''')
 
@@ -707,6 +717,51 @@ def build_html(deals, generated_at):
             color: var(--text);
         }}
 
+        .deal-items {{
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 8px;
+        }}
+
+        .deal-item {{
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.4;
+            transition: all 0.15s;
+        }}
+
+        .deal-item:active {{
+            background: #f0fdf4;
+        }}
+
+        .deal-item.in-cart {{
+            border-color: var(--accent);
+            background: #f0fdf4;
+            color: var(--text);
+        }}
+
+        .item-check {{
+            font-size: 16px;
+            flex-shrink: 0;
+            opacity: 0.4;
+        }}
+
+        .deal-item.in-cart .item-check {{
+            opacity: 1;
+        }}
+
+        .item-text {{
+            flex: 1;
+        }}
+
         .cart-btn {{
             margin-left: auto;
             background: #f0fdf4;
@@ -933,21 +988,22 @@ def build_html(deals, generated_at):
     <script>
         const HQ_LAT = {JARED_LAT};
         const HQ_LNG = {JARED_LNG};
-        const cart = new Set();
+        const cart = new Map(); // key: "disp|lat|lng|itemText" -> true
 
-        function toggleCart(btn) {{
-            const card = btn.closest('.deal-card');
-            const key = card.dataset.disp + '|' + card.dataset.lat + '|' + card.dataset.lng;
-            const title = card.querySelector('.deal-title').textContent;
+        function toggleItem(el) {{
+            const card = el.closest('.deal-card');
+            const disp = card.dataset.disp;
+            const lat = card.dataset.lat;
+            const lng = card.dataset.lng;
+            const text = el.querySelector('.item-text').textContent;
+            const key = disp + '|' + lat + '|' + lng + '|' + text;
 
-            if (cart.has(key + '|' + title)) {{
-                cart.delete(key + '|' + title);
-                btn.classList.remove('selected');
-                card.classList.remove('in-cart');
+            if (cart.has(key)) {{
+                cart.delete(key);
+                el.classList.remove('in-cart');
             }} else {{
-                cart.add(key + '|' + title);
-                btn.classList.add('selected');
-                card.classList.add('in-cart');
+                cart.set(key, true);
+                el.classList.add('in-cart');
             }}
             updateCartUI();
         }}
@@ -961,11 +1017,11 @@ def build_html(deals, generated_at):
         function openRoutePanel() {{
             // Group by dispensary and get unique stops
             const stops = {{}};
-            cart.forEach(item => {{
-                const [disp, lat, lng, ...titleParts] = item.split('|');
-                const title = titleParts.join('|');
-                if (!stops[disp]) stops[disp] = {{ lat: parseFloat(lat), lng: parseFloat(lng), deals: [] }};
-                stops[disp].deals.push(title);
+            cart.forEach((_, key) => {{
+                const [disp, lat, lng, ...textParts] = key.split('|');
+                const text = textParts.join('|');
+                if (!stops[disp]) stops[disp] = {{ lat: parseFloat(lat), lng: parseFloat(lng), items: [] }};
+                stops[disp].items.push(text);
             }});
 
             // Sort stops by nearest-neighbor from HQ
@@ -986,12 +1042,15 @@ def build_html(deals, generated_at):
                 curLng = data.lng;
             }}
 
-            // Build route stops HTML
+            // Build route stops HTML with shopping list per stop
             const stopsDiv = document.getElementById('routeStops');
-            stopsDiv.innerHTML = sorted.map((s, i) =>
-                '<div class="route-stop"><span class="stop-num">' + (i+1) + '</span><strong>' + s.name + '</strong><br>' +
-                '<span style="color:#666;font-size:12px;margin-left:32px;">' + s.deals.join(', ') + '</span></div>'
-            ).join('');
+            stopsDiv.innerHTML = sorted.map((s, i) => {{
+                const itemsList = s.items.map(item =>
+                    '<li style="font-size:13px; color:#444; padding:2px 0;">' + item + '</li>'
+                ).join('');
+                return '<div class="route-stop"><span class="stop-num">' + (i+1) + '</span><strong>' + s.name + '</strong>' +
+                    '<ul style="margin:6px 0 0 32px; padding-left:16px; list-style:disc;">' + itemsList + '</ul></div>';
+            }}).join('');
 
             // Build Google Maps directions URL
             const waypoints = sorted.map(s => s.lat + ',' + s.lng);
@@ -1018,8 +1077,7 @@ def build_html(deals, generated_at):
 
         function clearCart() {{
             cart.clear();
-            document.querySelectorAll('.cart-btn.selected').forEach(b => b.classList.remove('selected'));
-            document.querySelectorAll('.deal-card.in-cart').forEach(c => c.classList.remove('in-cart'));
+            document.querySelectorAll('.deal-item.in-cart').forEach(el => el.classList.remove('in-cart'));
             updateCartUI();
             closeRoutePanel();
         }}
